@@ -76,9 +76,11 @@ def migrate_database(db_path: str = "data/database.db",
         admin_id = existing_admin[0]
         print(f"   ℹ️  Admin user already exists (ID: {admin_id})")
     else:
-        # Hash password
+        # Hash password (truncate to 72 bytes for bcrypt compatibility)
         pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-        hashed_password = pwd_context.hash(admin_password)
+        # Ensure password is within bcrypt's 72 byte limit
+        safe_password = admin_password[:72] if len(admin_password.encode('utf-8')) > 72 else admin_password
+        hashed_password = pwd_context.hash(safe_password)
         
         cursor.execute("""
             INSERT INTO users (email, hashed_password, full_name)
