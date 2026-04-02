@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- prova 1-->
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
@@ -580,6 +581,35 @@
       const { useState, useEffect, useRef } = React;
 
       const API_URL = "http://localhost:8000";
+      // ========== AUTENTICAZIONE - INIZIO ==========
+// Check se l'utente è loggato
+const token = localStorage.getItem('token');
+if (!token) {
+  // Se non c'è token, redirect a login
+  window.location.href = 'login.html';
+}
+
+// Funzione per fare fetch con autenticazione
+async function fetchWithAuth(url, options = {}) {
+  const token = localStorage.getItem('token');
+  
+  const headers = {
+    ...options.headers,
+    'Authorization': `Bearer ${token}`
+  };
+  
+  const response = await fetchWithAuth(url, { ...options, headers });
+  
+  // Se il server risponde 401 (non autorizzato), redirect a login
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
+  }
+  
+  return response;
+}
+// ========== AUTENTICAZIONE - FINE ==========
       // Toast Notification System
       const showToast = (message, type = "info") => {
         const container = document.getElementById("toast-container");
@@ -1004,67 +1034,66 @@
         return icons[name] || null;
       };
 
-      function Header({
-        onImport,
-        onGenerateReport,
-        onManageCategories,
-        onBulkCategorize,
-      }) {
-        return (
-          <header className="dashboard-header">
-            <div className="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8">
-              <div className="flex flex-col gap-5 lg:flex-row lg:justify-between lg:items-center">
-                <div className="space-y-3">
-                  <div className="flex items-start gap-4">
-                    <div className="brand-mark">
-                      <Icon name="logo" className="icon-lg" size={26} />
-                    </div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-blue-600">
-                          Finance Tracker
-                        </h1>
-                      </div>
-                    </div>
-                  </div>
+     function Header({
+  onImport,
+  onGenerateReport,
+  onManageCategories,
+  onBulkCategorize,
+}) {
+  // ========== NUOVO: Leggi info utente ==========
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  
+  const handleLogout = () => {
+    if (confirm('Sei sicuro di voler uscire?')) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+  };
+  // ========== FINE NUOVO ==========
+  
+  return (
+    <header className="dashboard-header">
+      <div className="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-5 lg:flex-row lg:justify-between lg:items-center">
+          <div className="space-y-3">
+            <div className="flex items-start gap-4">
+              <div className="brand-mark">
+                <Icon name="logo" className="icon-lg" size={26} />
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-blue-600">
+                    Finance Tracker
+                  </h1>
                 </div>
-                <div className="dashboard-toolbar">
-                  <a
-                    href="recurring.html"
-                    className="px-4 py-2.5 bg-white/80 text-blue-700 rounded-2xl border border-blue-200 hover:border-blue-300 hover:text-blue-700 hover:bg-white flex items-center gap-2 no-underline shadow-sm"
-                  >
-                    Ricorrenti
-                  </a>
-                  <button
-                    onClick={onBulkCategorize}
-                    className="px-4 py-2.5 bg-white text-blue-700 rounded-2xl border border-blue-200 hover:border-blue-300 hover:text-blue-700 flex items-center gap-2 shadow-sm"
-                  >
-                     Auto-Categorizza
-                  </button>
-                  <button
-                    onClick={onManageCategories}
-                    className="px-4 py-2.5 bg-white text-blue-700 rounded-2xl border border-blue-200 hover:border-blue-300 hover:text-blue-700 flex items-center gap-2 shadow-sm"
-                  >
-                     Categorie
-                  </button>
-                  <button
-                    onClick={onImport}
-                    className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-500 text-white rounded-2xl hover:from-blue-600 hover:to-blue-600 flex items-center gap-2 shadow-lg shadow-emerald-500/20"
-                  >
-                    <Icon name="import" /> Importa
-                  </button>
-                  <button
-                    onClick={onGenerateReport}
-                    className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl hover:from-emerald-600 hover:to-teal-600 flex items-center gap-2 shadow-lg shadow-emerald-500/20"
-                  >
-                    <Icon name="report" /> Report
-                  </button>
-                </div>
+                {/* ========== NUOVO: Mostra nome utente ========== */}
+                {user.full_name && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Benvenuto, {user.full_name}
+                  </p>
+                )}
+                {/* ========== FINE NUOVO ========== */}
               </div>
             </div>
-          </header>
-        );
-      }
+          </div>
+          <div className="dashboard-toolbar">
+            {/* ... pulsanti esistenti ... */}
+            
+            {/* ========== NUOVO: Pulsante Logout ========== */}
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2.5 bg-white text-red-600 rounded-2xl border border-red-200 hover:border-red-300 hover:bg-red-50 flex items-center gap-2 shadow-sm"
+            >
+              Esci
+            </button>
+            {/* ========== FINE NUOVO ========== */}
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
 
       function StatsCard({ title, value, subtitle, icon, className }) {
         return (
@@ -1610,7 +1639,7 @@
           ) {
             setLoadingSuggestion(true);
             try {
-              const response = await fetch(
+              const response = await fetchWithAuth(
                 `${API_URL}/api/smart-categorize?description=${encodeURIComponent(tx.description_normalized)}`,
               );
               const suggestion = await response.json();
@@ -1627,7 +1656,7 @@
             // Se il campo è vuoto, usa "UNCATEGORIZED" invece di stringa vuota
             const categoryToSave = newCategory.trim() || "UNCATEGORIZED";
 
-            await fetch(
+            await fetchWithAuth(
               `${API_URL}/api/transactions/${transactionId}/category`,
               {
                 method: "PUT",
@@ -1717,7 +1746,7 @@
           }
 
           try {
-            const response = await fetch(
+            const response = await fetchWithAuth(
               `${API_URL}/api/transactions/delete-multiple`,
               {
                 method: "POST",
@@ -2007,7 +2036,7 @@
           formData.append("file", file);
 
           try {
-            const response = await fetch(
+            const response = await fetchWithAuth(
               `${API_URL}/api/upload?allow_duplicates=${allowDuplicates}`,
               {
                 method: "POST",
@@ -2126,7 +2155,7 @@
 
         const fetchRules = async () => {
           try {
-            const response = await fetch(`${API_URL}/api/rules`);
+            const response = await fetchWithAuth(`${API_URL}/api/rules`);
             const data = await response.json();
             setRules(data);
           } catch (error) {
@@ -2136,7 +2165,7 @@
 
         const fetchUserCategories = async () => {
           try {
-            const response = await fetch(`${API_URL}/api/user-categories`);
+            const response = await fetchWithAuth(`${API_URL}/api/user-categories`);
             const data = await response.json();
             setUserCategories(data);
           } catch (error) {
@@ -2151,7 +2180,7 @@
           }
 
           try {
-            const response = await fetch(
+            const response = await fetchWithAuth(
               `${API_URL}/api/user-categories?category_name=${encodeURIComponent(newCategory)}`,
               {
                 method: "POST",
@@ -2176,7 +2205,7 @@
           }
 
           try {
-            const response = await fetch(`${API_URL}/api/rules`, {
+            const response = await fetchWithAuth(`${API_URL}/api/rules`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -2204,7 +2233,7 @@
           if (!confirm("Eliminare questa regola?")) return;
 
           try {
-            const response = await fetch(
+            const response = await fetchWithAuth(
               `${API_URL}/api/rules/${index}?learned=${learned}`,
               {
                 method: "DELETE",
@@ -2237,7 +2266,7 @@
           }
 
           try {
-            const response = await fetch(
+            const response = await fetchWithAuth(
               `${API_URL}/api/rules/${editingRule.index}?learned=${editingRule.learned}`,
               {
                 method: "PUT",
@@ -2646,7 +2675,7 @@
           setSubmitting(true);
 
           try {
-            const response = await fetch(`${API_URL}/api/transactions`, {
+            const response = await fetchWithAuth(`${API_URL}/api/transactions`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -2830,11 +2859,11 @@
 
             const [statsRes, txRes, catStatsRes, monthlyRes, userCatRes] =
               await Promise.all([
-                fetch(`${API_URL}/api/stats/summary?${params}`),
-                fetch(`${API_URL}/api/transactions?${params}`),
-                fetch(`${API_URL}/api/stats/categories?${params}`),
-                fetch(`${API_URL}/api/stats/monthly`),
-                fetch(`${API_URL}/api/user-categories`),
+                fetchWithAuth(`${API_URL}/api/stats/summary?${params}`),
+                fetchWithAuth(`${API_URL}/api/transactions?${params}`),
+                fetchWithAuth(`${API_URL}/api/stats/categories?${params}`),
+                fetchWithAuth(`${API_URL}/api/stats/monthly`),
+                fetchWithAuth(`${API_URL}/api/user-categories`),
               ]);
 
             const statsData = await statsRes.json();
@@ -2871,7 +2900,7 @@
           const loading = showLoading("AI sta categorizzando...");
 
           try {
-            const response = await fetch(`${API_URL}/api/bulk-categorize`, {
+            const response = await fetchWithAuth(`${API_URL}/api/bulk-categorize`, {
               method: "POST",
             });
 
@@ -2905,7 +2934,7 @@
               params.append("start_date", filters.startDate);
             if (filters.endDate) params.append("end_date", filters.endDate);
 
-            const response = await fetch(
+            const response = await fetchWithAuth(
               `${API_URL}/api/reports/generate?${params}`,
               {
                 method: "POST",
