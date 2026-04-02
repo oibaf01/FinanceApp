@@ -1,0 +1,3063 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finance Tracker</title>
+
+    <!-- React & ReactDOM -->
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      :root {
+        --color-primary: #0f172a;
+        --color-secondary: #10b981;
+        --color-accent: #2563eb;
+        --color-success: #10b981;
+        --color-warning: #f59e0b;
+        --color-error: #ef4444;
+        --color-info: #3b82f6;
+        --color-surface: rgba(255, 255, 255, 0.82);
+        --color-surface-strong: rgba(255, 255, 255, 0.94);
+        --color-border: rgba(148, 163, 184, 0.16);
+        --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.08);
+        --shadow-hover: 0 24px 60px rgba(15, 23, 42, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        color: #0f172a;
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(37, 99, 235, 0.12),
+            transparent 28%
+          ),
+          radial-gradient(
+            circle at top right,
+            rgba(16, 185, 129, 0.12),
+            transparent 24%
+          ),
+          linear-gradient(180deg, #f8fbff 0%, #f1f5f9 42%, #eef2ff 100%);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+        background-size: 32px 32px;
+        mask-image: linear-gradient(
+          180deg,
+          rgba(0, 0, 0, 0.28),
+          transparent 70%
+        );
+      }
+
+      .app-shell {
+        position: relative;
+      }
+
+      .app-shell::before,
+      .app-shell::after {
+        content: "";
+        position: fixed;
+        width: 340px;
+        height: 340px;
+        border-radius: 9999px;
+        filter: blur(65px);
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.55;
+      }
+
+      .app-shell::before {
+        top: -120px;
+        right: -40px;
+        background: rgba(59, 130, 246, 0.22);
+      }
+
+      .app-shell::after {
+        bottom: -120px;
+        left: -60px;
+        background: rgba(16, 185, 129, 0.18);
+      }
+
+      .dashboard-header {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+        background: rgba(248, 250, 252, 0.72);
+        backdrop-filter: blur(20px);
+      }
+
+      .dashboard-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+        justify-content: flex-end;
+      }
+
+      .brand-mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
+        color: white;
+        box-shadow: 0 12px 32px rgba(37, 99, 235, 0.25);
+      }
+
+      .section-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.75rem;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.7);
+        color: #334155;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .card {
+        position: relative;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        backdrop-filter: blur(16px);
+        border-radius: 24px;
+        box-shadow: var(--shadow-soft);
+        padding: 1.5rem;
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.7),
+          rgba(148, 163, 184, 0.08)
+        );
+        -webkit-mask:
+          linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+
+      .stat-card {
+        position: relative;
+        color: white;
+        border-radius: 24px;
+        padding: 1.5rem;
+        min-height: 178px;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+        overflow: hidden;
+      }
+
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at top right,
+          rgba(255, 255, 255, 0.18),
+          transparent 34%
+        );
+        pointer-events: none;
+      }
+
+      .stat-card::after {
+        content: "";
+        position: absolute;
+        width: 140px;
+        height: 140px;
+        right: -30px;
+        bottom: -40px;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .income-card {
+        background: linear-gradient(135deg, #0f766e 0%, #10b981 100%);
+      }
+
+      .expense-card {
+        background: linear-gradient(135deg, #be185d 0%, #f97316 100%);
+      }
+
+      .savings-card {
+        background: linear-gradient(135deg, #1d4ed8 0%, #38bdf8 100%);
+      }
+
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        padding: 24px;
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(10px);
+      }
+
+      .modal.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background: var(--color-surface-strong);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        border-radius: 28px;
+        padding: 2rem;
+        max-width: 900px;
+        width: min(100%, 980px);
+        max-height: min(86vh, 960px);
+        overflow-y: auto;
+        box-shadow: 0 32px 80px rgba(15, 23, 42, 0.24);
+      }
+
+      .ai-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%);
+        color: white;
+        padding: 6px 10px;
+        border-radius: 9999px;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.03em;
+        box-shadow: 0 10px 28px rgba(99, 102, 241, 0.22);
+      }
+
+      .confidence-bar {
+        height: 5px;
+        background: rgba(226, 232, 240, 0.8);
+        border-radius: 9999px;
+        overflow: hidden;
+      }
+
+      .confidence-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #10b981, #3b82f6);
+        transition: width 0.3s;
+      }
+
+      .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .toast {
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        border-radius: 18px;
+        padding: 16px 18px;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 320px;
+        animation: slideInRight 0.3s ease-out;
+        backdrop-filter: blur(12px);
+      }
+
+      .toast.hiding {
+        animation: slideOutRight 0.3s ease-in;
+      }
+
+      .toast-success {
+        border-left: 4px solid var(--color-success);
+      }
+      .toast-error {
+        border-left: 4px solid var(--color-error);
+      }
+      .toast-info {
+        border-left: 4px solid var(--color-info);
+      }
+      .toast-warning {
+        border-left: 4px solid var(--color-warning);
+      }
+
+      @keyframes slideInRight {
+        from {
+          transform: tranblueX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: tranblueX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideOutRight {
+        from {
+          transform: tranblueX(0);
+          opacity: 1;
+        }
+        to {
+          transform: tranblueX(100%);
+          opacity: 0;
+        }
+      }
+
+      .loading-overlay {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.65);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        backdrop-filter: blur(8px);
+      }
+
+      .loading-content {
+        background: rgba(255, 255, 255, 0.96);
+        border-radius: 24px;
+        padding: 2rem 2.25rem;
+        text-align: center;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+      }
+
+      .loading-overlay.fade-out {
+        animation: fadeOut 0.3s ease-out;
+      }
+
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+
+      .spinner {
+        border: 3px solid #dbeafe;
+        border-top: 3px solid #2563eb;
+        border-radius: 50%;
+        width: 42px;
+        height: 42px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: tranblueX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: tranblueX(-10px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: tranblueX(10px);
+        }
+      }
+
+      .error-shake {
+        animation: shake 0.5s;
+      }
+
+      .confetti-particle {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background: #10b981;
+        top: -10px;
+        z-index: 9998;
+        animation: confettiFall 2s linear;
+      }
+
+      @keyframes confettiFall {
+        to {
+          transform: tranblueY(100vh) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      .icon {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        display: inline-block;
+        vertical-align: middle;
+        flex-shrink: 0;
+      }
+
+      .icon-lg {
+        width: 32px;
+        height: 32px;
+      }
+
+      input,
+      select,
+      textarea {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(203, 213, 225, 0.9) !important;
+        border-radius: 14px !important;
+        min-height: 46px;
+        transition: all 0.2s ease;
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03);
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: rgba(59, 130, 246, 0.65) !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.14) !important;
+      }
+
+      button,
+      a {
+        transition: all 0.2s ease;
+      }
+
+      button:hover,
+      a:hover {
+        transform: tranblueY(-1px);
+      }
+
+      table {
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+
+      thead th {
+        position: sticky;
+        top: 0;
+        background: rgba(248, 250, 252, 0.92) !important;
+        backdrop-filter: blur(10px);
+        z-index: 1;
+        font-size: 0.7rem !important;
+        letter-spacing: 0.08em;
+      }
+
+      tbody tr {
+        transition:
+          background-color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      tbody tr:hover {
+        background: rgba(248, 250, 252, 0.86) !important;
+      }
+
+      .chip-soft {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.45rem 0.8rem;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.76);
+        border: 1px solid rgba(203, 213, 225, 0.66);
+      }
+
+      .panel-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #0f172a;
+      }
+
+      .panel-title-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        background: linear-gradient(
+          135deg,
+          rgba(37, 99, 235, 0.14),
+          rgba(16, 185, 129, 0.16)
+        );
+        color: #1d4ed8;
+      }
+
+      .subtle-divider {
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          rgba(226, 232, 240, 0),
+          rgba(226, 232, 240, 1),
+          rgba(226, 232, 240, 0)
+        );
+      }
+
+      @media (max-width: 960px) {
+        .dashboard-toolbar {
+          justify-content: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="toast-container" class="toast-container"></div>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+
+      const API_URL = "http://localhost:8000";
+      // Toast Notification System
+      const showToast = (message, type = "info") => {
+        const container = document.getElementById("toast-container");
+        if (!container) return;
+
+        const toast = document.createElement("div");
+        toast.className = `toast toast-${type}`;
+
+        const icons = {
+          success:
+            '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>',
+          error:
+            '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>',
+          warning:
+            '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>',
+          info: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>',
+        };
+
+        const colors = {
+          success: "#10B981",
+          error: "#EF4444",
+          warning: "#F59E0B",
+          info: "#3B82F6",
+        };
+
+        toast.innerHTML = `         <div class="toast-icon" style="color: ${colors[type]}">${icons[type]}</div>         <div class="toast-message" style="color: #0F172A; font-weight: 500;">${message}</div>     `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+          toast.classList.add("hiding");
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      };
+
+      // Loading Overlay
+      const showLoading = (message = "Caricamento...") => {
+        const overlay = document.createElement("div");
+        overlay.className = "loading-overlay";
+        overlay.innerHTML = `         <div class="loading-content">             <div class="spinner"></div>             <p style="color: #0F172A; font-weight: 600; font-size: 16px;">${message}</p>         </div>     `;
+        document.body.appendChild(overlay);
+        return overlay;
+      };
+
+      const hideLoading = (overlay) => {
+        if (overlay) {
+          overlay.classList.add("fade-out");
+          setTimeout(() => overlay.remove(), 300);
+        }
+      };
+
+      // Success Animation (Confetti)
+      const showSuccessAnimation = () => {
+        const colors = ["#10B981", "#3B82F6", "#F59E0B", "#EF4444", "#8B5CF6"];
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement("div");
+          particle.className = "confetti-particle";
+          particle.style.left = Math.random() * 100 + "%";
+          particle.style.background =
+            colors[Math.floor(Math.random() * colors.length)];
+          particle.style.animationDelay = Math.random() * 0.5 + "s";
+          document.body.appendChild(particle);
+
+          setTimeout(() => particle.remove(), 2000);
+        }
+      };
+
+      // Shake Element
+      const shakeElement = (element) => {
+        if (element) {
+          element.classList.add("error-shake");
+          setTimeout(() => element.classList.remove("error-shake"), 500);
+        }
+      };
+
+      const formatCurrency = (amount) => {
+        return new Intl.NumberFormat("it-IT", {
+          style: "currency",
+          currency: "EUR",
+        }).format(amount);
+      };
+
+      const formatDate = (dateStr) => {
+        return new Date(dateStr).toLocaleDateString("it-IT");
+      };
+
+      const Icon = ({ name, className = "icon", size = 20 }) => {
+        const icons = {
+          logo: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <rect x="3" y="6" width="18" height="12" rx="2"></rect>
+              <path d="M3 10h18"></path>
+              <path d="M7 15h.01"></path>
+              <path d="M11 15h2"></path>
+            </svg>
+          ),
+          recurring: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M3 12a9 9 0 0 1 15.54-6.36"></path>
+              <path d="M21 3v6h-6"></path>
+              <path d="M21 12a9 9 0 0 1-15.54 6.36"></path>
+              <path d="M3 21v-6h6"></path>
+            </svg>
+          ),
+          ai: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M12 2l2.4 4.86L20 9.27l-4 3.9.94 5.46L12 16l-4.94 2.63.94-5.46-4-3.9 5.6-2.41L12 2z"></path>
+            </svg>
+          ),
+          categories: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M20.59 13.41 11 3.83V3H4v7h.83l9.58 9.59a2 2 0 0 0 2.83 0l3.35-3.35a2 2 0 0 0 0-2.83Z"></path>
+              <path d="M7 7h.01"></path>
+            </svg>
+          ),
+          import: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M12 3v12"></path>
+              <path d="m7 10 5 5 5-5"></path>
+              <path d="M5 21h14"></path>
+            </svg>
+          ),
+          report: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M3 3h18v18H3z"></path>
+              <path d="M8 15V9"></path>
+              <path d="M12 15V6"></path>
+              <path d="M16 15v-3"></path>
+            </svg>
+          ),
+          filter: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path>
+            </svg>
+          ),
+          calendar: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+              <path d="M16 2v4"></path>
+              <path d="M8 2v4"></path>
+              <path d="M3 10h18"></path>
+            </svg>
+          ),
+          search: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+          ),
+          reset: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M3 2v6h6"></path>
+              <path d="M21 12a9 9 0 0 0-15.55-6.36L3 8"></path>
+              <path d="M21 22v-6h-6"></path>
+              <path d="M3 12a9 9 0 0 0 15.55 6.36L21 16"></path>
+            </svg>
+          ),
+          plus: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M12 5v14"></path>
+              <path d="M5 12h14"></path>
+            </svg>
+          ),
+          trash: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M3 6h18"></path>
+              <path d="M8 6V4h8v2"></path>
+              <path d="M19 6l-1 14H6L5 6"></path>
+              <path d="M10 11v6"></path>
+              <path d="M14 11v6"></path>
+            </svg>
+          ),
+          edit: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4Z"></path>
+            </svg>
+          ),
+          close: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M18 6 6 18"></path>
+              <path d="m6 6 12 12"></path>
+            </svg>
+          ),
+          save: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <path d="M17 21v-8H7v8"></path>
+              <path d="M7 3v5h8"></path>
+            </svg>
+          ),
+          list: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M8 6h13"></path>
+              <path d="M8 12h13"></path>
+              <path d="M8 18h13"></path>
+              <path d="M3 6h.01"></path>
+              <path d="M3 12h.01"></path>
+              <path d="M3 18h.01"></path>
+            </svg>
+          ),
+          folder: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"></path>
+            </svg>
+          ),
+          file: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <path d="M14 2v6h6"></path>
+            </svg>
+          ),
+          income: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M12 19V5"></path>
+              <path d="m5 12 7-7 7 7"></path>
+            </svg>
+          ),
+          expense: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M12 5v14"></path>
+              <path d="m19 12-7 7-7-7"></path>
+            </svg>
+          ),
+          trend: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M3 17l6-6 4 4 8-8"></path>
+              <path d="M14 7h7v7"></path>
+            </svg>
+          ),
+        };
+
+        return icons[name] || null;
+      };
+
+      function Header({
+        onImport,
+        onGenerateReport,
+        onManageCategories,
+        onBulkCategorize,
+      }) {
+        return (
+          <header className="dashboard-header">
+            <div className="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8">
+              <div className="flex flex-col gap-5 lg:flex-row lg:justify-between lg:items-center">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-4">
+                    <div className="brand-mark">
+                      <Icon name="logo" className="icon-lg" size={26} />
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-blue-600">
+                          Finance Tracker
+                        </h1>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="dashboard-toolbar">
+                  <a
+                    href="recurring.html"
+                    className="px-4 py-2.5 bg-white/80 text-blue-700 rounded-2xl border border-blue-200 hover:border-blue-300 hover:text-blue-700 hover:bg-white flex items-center gap-2 no-underline shadow-sm"
+                  >
+                    Ricorrenti
+                  </a>
+                  <button
+                    onClick={onBulkCategorize}
+                    className="px-4 py-2.5 bg-white text-blue-700 rounded-2xl border border-blue-200 hover:border-blue-300 hover:text-blue-700 flex items-center gap-2 shadow-sm"
+                  >
+                     Auto-Categorizza
+                  </button>
+                  <button
+                    onClick={onManageCategories}
+                    className="px-4 py-2.5 bg-white text-blue-700 rounded-2xl border border-blue-200 hover:border-blue-300 hover:text-blue-700 flex items-center gap-2 shadow-sm"
+                  >
+                     Categorie
+                  </button>
+                  <button
+                    onClick={onImport}
+                    className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-500 text-white rounded-2xl hover:from-blue-600 hover:to-blue-600 flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+                  >
+                    <Icon name="import" /> Importa
+                  </button>
+                  <button
+                    onClick={onGenerateReport}
+                    className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl hover:from-emerald-600 hover:to-teal-600 flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+                  >
+                    <Icon name="report" /> Report
+                  </button>
+                </div>
+              </div>
+            </div>
+          </header>
+        );
+      }
+
+      function StatsCard({ title, value, subtitle, icon, className }) {
+        return (
+          <div className={`stat-card ${className}`}>
+            <div className="relative z-10 flex justify-between items-start gap-6">
+              <div className="flex-1">
+                <p className="text-white/80 text-sm font-medium tracking-wide">
+                  {title}
+                </p>
+                <p className="text-3xl md:text-[2rem] font-bold mt-3 tracking-tight">
+                  {value}
+                </p>
+                {subtitle && (
+                  <p className="text-white/70 text-xs mt-2">{subtitle}</p>
+                )}
+              </div>
+              <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-white">
+                {icon}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function Filters({
+        filters,
+        setFilters,
+        onReset,
+        onApply,
+        userCategories,
+      }) {
+        const [localFilters, setLocalFilters] = useState(filters);
+        const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+        const [filteredCategories, setFilteredCategories] = useState([]);
+        const categoryInputRef = useRef(null);
+
+        useEffect(() => {
+          setLocalFilters(filters);
+        }, [filters]);
+
+        useEffect(() => {
+          if (localFilters.category && userCategories.length > 0) {
+            const searchTerm = localFilters.category.toLowerCase();
+
+            // Filtra le categorie che contengono il testo cercato
+            const filtered = userCategories.filter((cat) =>
+              cat.toLowerCase().includes(searchTerm),
+            );
+
+            // Ordina per rilevanza (match all'inizio prima)
+            const sorted = filtered.sort((a, b) => {
+              const aLower = a.toLowerCase();
+              const bLower = b.toLowerCase();
+
+              const aStartsWith = aLower.startsWith(searchTerm);
+              const bStartsWith = bLower.startsWith(searchTerm);
+
+              if (aStartsWith && !bStartsWith) return -1;
+              if (!aStartsWith && bStartsWith) return 1;
+
+              return aLower.localeCompare(bLower);
+            });
+
+            setFilteredCategories(sorted.slice(0, 8));
+          } else {
+            setFilteredCategories(userCategories.slice(0, 8));
+          }
+        }, [localFilters.category, userCategories]);
+
+        const handleApply = () => {
+          setFilters(localFilters);
+          setShowCategoryDropdown(false);
+          if (onApply) onApply();
+        };
+
+        const handleSelectCategory = (category) => {
+          setLocalFilters({ ...localFilters, category: category });
+          setShowCategoryDropdown(false);
+          if (categoryInputRef.current) {
+            categoryInputRef.current.blur();
+          }
+        };
+
+        const handleCategoryInputChange = (e) => {
+          setLocalFilters({ ...localFilters, category: e.target.value });
+          setShowCategoryDropdown(e.target.value.length > 0);
+        };
+
+        const handleCategoryFocus = () => {
+          if (localFilters.category && localFilters.category.length > 0) {
+            setShowCategoryDropdown(true);
+          }
+        };
+
+        const handleCategoryBlur = () => {
+          setTimeout(() => setShowCategoryDropdown(false), 200);
+        };
+
+        const handlePreset = (preset) => {
+          const today = new Date();
+          let start, end;
+
+          if (preset === "this_month") {
+            start = new Date(today.getFullYear(), today.getMonth(), 1);
+            end = today;
+          } else if (preset === "last_month") {
+            start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            end = new Date(today.getFullYear(), today.getMonth(), 0);
+          } else if (preset === "last_3_months") {
+            start = new Date(today.getFullYear(), today.getMonth() - 3, 1);
+            end = today;
+          } else if (preset === "this_year") {
+            start = new Date(today.getFullYear(), 0, 1);
+            end = today;
+          }
+
+          if (start && end) {
+            const newFilters = {
+              ...localFilters,
+              startDate: start.toISOString().split("T")[0],
+              endDate: end.toISOString().split("T")[0],
+            };
+            setLocalFilters(newFilters);
+            // Applica automaticamente i preset
+            setFilters(newFilters);
+          }
+        };
+
+        return (
+          <div className="card mb-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Icon name="filter" /> Filtri Periodo
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Data Inizio
+                </label>
+                <input
+                  type="date"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  value={localFilters.startDate}
+                  onChange={(e) =>
+                    setLocalFilters({
+                      ...localFilters,
+                      startDate: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Data Fine
+                </label>
+                <input
+                  type="date"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  value={localFilters.endDate}
+                  onChange={(e) =>
+                    setLocalFilters({
+                      ...localFilters,
+                      endDate: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Categoria
+                </label>
+                <input
+                  ref={categoryInputRef}
+                  type="text"
+                  placeholder="Tutte"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  value={localFilters.category}
+                  onChange={handleCategoryInputChange}
+                  onFocus={handleCategoryFocus}
+                  onBlur={handleCategoryBlur}
+                  autoComplete="off"
+                />
+
+                {/* Dropdown categorie */}
+                {showCategoryDropdown && filteredCategories.length > 0 && (
+                  <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredCategories.map((cat, idx) => (
+                      <div
+                        key={idx}
+                        onClick={() => handleSelectCategory(cat)}
+                        className="px-3 py-2 hover:bg-blue-50 cursor-pointer flex items-center justify-between"
+                      >
+                        <span className="text-gray-800">{cat}</span>
+                        {localFilters.category &&
+                          cat
+                            .toLowerCase()
+                            .includes(localFilters.category.toLowerCase()) && (
+                            <span className="text-xs text-blue-600">✓</span>
+                          )}
+                      </div>
+                    ))}
+
+                    {localFilters.category &&
+                      filteredCategories.length === 0 && (
+                        <div className="px-3 py-2 text-gray-500 text-sm italic">
+                          Nessuna categoria trovata
+                        </div>
+                      )}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Preset Rapidi
+                </label>
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  onChange={(e) => handlePreset(e.target.value)}
+                  value=""
+                >
+                  <option value="">Seleziona...</option>
+                  <option value="this_month">Questo mese</option>
+                  <option value="last_month">Mese scorso</option>
+                  <option value="last_3_months">Ultimi 3 mesi</option>
+                  <option value="this_year">Quest'anno</option>
+                </select>
+              </div>
+              <div className="flex items-end">
+                <button
+                  className="w-full px-4 py-3 bg-blue-600 text-white rounded-2xl hover:bg-blue-900 inline-flex items-center justify-center gap-2 shadow-lg shadow-blue-900/10"
+                  onClick={handleApply}
+                >
+                  <Icon name="search" /> Applica
+                </button>
+              </div>
+              <div className="flex items-end">
+                <button
+                  className="w-full px-4 py-3 bg-white text-blue-700 rounded-2xl border border-blue-200 hover:border-blue-300 inline-flex items-center justify-center gap-2 shadow-sm"
+                  onClick={() => {
+                    const resetFilters = {
+                      startDate: "",
+                      endDate: "",
+                      category: "",
+                    };
+                    setLocalFilters(resetFilters);
+                    setFilters(resetFilters);
+                    if (onReset) onReset();
+                  }}
+                >
+                  <Icon name="reset" /> Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function ChartsSection({ categoryStats, monthlyStats }) {
+        const pieChartRef = useRef(null);
+        const barChartRef = useRef(null);
+        const pieChartInstance = useRef(null);
+        const barChartInstance = useRef(null);
+
+        useEffect(() => {
+          if (!categoryStats || categoryStats.length === 0) return;
+
+          if (pieChartInstance.current) pieChartInstance.current.destroy();
+          if (barChartInstance.current) barChartInstance.current.destroy();
+
+          // Funzione per generare colori dinamicamente
+          const generateColors = (count, isIncome = false) => {
+            if (isIncome) {
+              // Tutte le entrate in verde
+              return Array(count).fill("#10b981"); // Verde
+            }
+
+            // Palette estesa per uscite (NO verde o sfumature di verde)
+            const expenseColors = [
+              "#FF6384", // Rosa
+              "#36A2EB", // Blu
+              "#FFCE56", // Giallo
+              "#9966FF", // Viola
+              "#FF9F40", // Arancione
+              "#FF6B6B", // Rosso chiaro
+              "#4ECDC4", // Turchese
+              "#95E1D3", // Acqua
+              "#F38181", // Rosa salmone
+              "#AA96DA", // Lavanda
+              "#FCBAD3", // Rosa pastello
+              "#FFFFD2", // Giallo pastello
+              "#A8D8EA", // Azzurro
+              "#FFAAA7", // Pesca
+              "#C7CEEA", // Blu pastello
+              "#FFD3B6", // Arancione pastello
+              "#FFAAA5", // Corallo
+              "#FF8B94", // Rosa scuro
+              "#A8E6CF", // Menta (chiaro, non verde)
+              "#DCEDC1", // Lime chiaro
+            ];
+
+            // Se servono più colori, genera variazioni
+            const colors = [];
+            for (let i = 0; i < count; i++) {
+              colors.push(expenseColors[i % expenseColors.length]);
+            }
+            return colors;
+          };
+
+          // Separa entrate e uscite
+          const expenseCategories = categoryStats.filter((c) => c.total < 0);
+          const incomeCategories = categoryStats.filter((c) => c.total > 0);
+
+          // Combina tutte le categorie
+          const allCategories = [...incomeCategories, ...expenseCategories];
+
+          const pieData = {
+            labels: allCategories.map((c) => c.category),
+            datasets: [
+              {
+                data: allCategories.map((c) => Math.abs(c.total)),
+                backgroundColor: [
+                  ...generateColors(incomeCategories.length, true), // Verde per entrate
+                  ...generateColors(expenseCategories.length, false), // Altri colori per uscite
+                ],
+                borderWidth: 2,
+                borderColor: "#fff",
+              },
+            ],
+          };
+
+          if (pieChartRef.current) {
+            pieChartInstance.current = new Chart(pieChartRef.current, {
+              type: "doughnut",
+              data: pieData,
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: "right",
+                    labels: {
+                      boxWidth: 15,
+                      padding: 10,
+                      font: {
+                        size: 11,
+                      },
+                      generateLabels: function (chart) {
+                        const data = chart.data;
+                        if (data.labels.length && data.datasets.length) {
+                          return data.labels.map((label, i) => {
+                            const value = data.datasets[0].data[i];
+                            const total = data.datasets[0].data.reduce(
+                              (a, b) => a + b,
+                              0,
+                            );
+                            const percentage = ((value / total) * 100).toFixed(
+                              1,
+                            );
+
+                            return {
+                              text: `${label} (${percentage}%)`,
+                              fillStyle: data.datasets[0].backgroundColor[i],
+                              hidden: false,
+                              index: i,
+                            };
+                          });
+                        }
+                        return [];
+                      },
+                    },
+                  },
+                  title: {
+                    display: true,
+                    text: "Distribuzione per Categoria",
+                    font: {
+                      size: 14,
+                      weight: "bold",
+                    },
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        const label = context.label || "";
+                        const value = context.parsed || 0;
+                        const total = context.dataset.data.reduce(
+                          (a, b) => a + b,
+                          0,
+                        );
+                        const percentage = ((value / total) * 100).toFixed(1);
+                        return `${label}: €${value.toFixed(2)} (${percentage}%)`;
+                      },
+                    },
+                  },
+                },
+              },
+            });
+          }
+
+          if (monthlyStats && monthlyStats.length > 0 && barChartRef.current) {
+            const barData = {
+              labels: monthlyStats.map((m) => m.month),
+              datasets: [
+                {
+                  label: "Entrate",
+                  data: monthlyStats.map((m) => m.income),
+                  backgroundColor: "rgba(54, 162, 235, 0.5)",
+                  borderColor: "rgba(54, 162, 235, 1)",
+                  borderWidth: 1,
+                },
+                {
+                  label: "Uscite",
+                  data: monthlyStats.map((m) => m.expenses),
+                  backgroundColor: "rgba(255, 99, 132, 0.5)",
+                  borderColor: "rgba(255, 99, 132, 1)",
+                  borderWidth: 1,
+                },
+              ],
+            };
+
+            barChartInstance.current = new Chart(barChartRef.current, {
+              type: "bar",
+              data: barData,
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Trend Mensile Entrate vs Uscite",
+                  },
+                },
+                scales: { y: { beginAtZero: true } },
+              },
+            });
+          }
+
+          return () => {
+            if (pieChartInstance.current) pieChartInstance.current.destroy();
+            if (barChartInstance.current) barChartInstance.current.destroy();
+          };
+        }, [categoryStats, monthlyStats]);
+
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="card">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="panel-title">
+                  <span className="panel-title-icon">
+                    <Icon name="categories" size={18} />
+                  </span>{" "}
+                  Distribuzione categorie
+                </h3>
+              </div>
+              <div style={{ height: "300px" }}>
+                <canvas ref={pieChartRef}></canvas>
+              </div>
+            </div>
+            <div className="card">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="panel-title">
+                  <span className="panel-title-icon">
+                    <Icon name="trend" size={18} />
+                  </span>{" "}
+                  Trend mensile
+                </h3>
+              </div>
+              <div style={{ height: "300px" }}>
+                <canvas ref={barChartRef}></canvas>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function TransactionsTable({
+        transactions,
+        onCategoryUpdate,
+        userCategories,
+        onAddTransaction,
+      }) {
+        const [editingId, setEditingId] = useState(null);
+        const [newCategory, setNewCategory] = useState("");
+        const [aiSuggestion, setAiSuggestion] = useState(null);
+        const [loadingSuggestion, setLoadingSuggestion] = useState(false);
+        const [showDropdown, setShowDropdown] = useState(false);
+        const [filteredCategories, setFilteredCategories] = useState([]);
+        const [selectedIds, setSelectedIds] = useState([]);
+        const [selectAll, setSelectAll] = useState(false);
+        const inputRef = useRef(null);
+
+        useEffect(() => {
+          if (newCategory && userCategories.length > 0) {
+            const searchTerm = newCategory.toLowerCase();
+
+            // Filtra le categorie che contengono il testo cercato
+            const filtered = userCategories.filter((cat) =>
+              cat.toLowerCase().includes(searchTerm),
+            );
+
+            // Ordina per rilevanza:
+            // 1. Match esatto all'inizio (es. "TR" → "TRASPORTI" prima di "NUTRIZIONE")
+            // 2. Match esatto (tutta la parola)
+            // 3. Match parziale
+            const sorted = filtered.sort((a, b) => {
+              const aLower = a.toLowerCase();
+              const bLower = b.toLowerCase();
+
+              // Match esatto all'inizio ha priorità massima
+              const aStartsWith = aLower.startsWith(searchTerm);
+              const bStartsWith = bLower.startsWith(searchTerm);
+
+              if (aStartsWith && !bStartsWith) return -1;
+              if (!aStartsWith && bStartsWith) return 1;
+
+              // Se entrambi iniziano con il termine, ordina alfabeticamente
+              if (aStartsWith && bStartsWith)
+                return aLower.localeCompare(bLower);
+
+              // Altrimenti ordina alfabeticamente
+              return aLower.localeCompare(bLower);
+            });
+
+            setFilteredCategories(sorted.slice(0, 8));
+          } else {
+            setFilteredCategories(userCategories.slice(0, 8));
+          }
+        }, [newCategory, userCategories]);
+
+        const handleStartEdit = async (tx) => {
+          setEditingId(tx.id);
+          // Se la categoria è UNCATEGORIZED o NON_CATEGORIZZATO, parti da campo vuoto
+          const currentCategory = tx.category || "";
+          const isUncategorized =
+            !currentCategory ||
+            currentCategory === "UNCATEGORIZED" ||
+            currentCategory === "NON_CATEGORIZZATO";
+          setNewCategory(isUncategorized ? "" : currentCategory);
+          setShowDropdown(false);
+
+          if (
+            !tx.category ||
+            tx.category === "UNCATEGORIZED" ||
+            tx.category === "NON_CATEGORIZZATO"
+          ) {
+            setLoadingSuggestion(true);
+            try {
+              const response = await fetch(
+                `${API_URL}/api/smart-categorize?description=${encodeURIComponent(tx.description_normalized)}`,
+              );
+              const suggestion = await response.json();
+              setAiSuggestion(suggestion);
+            } catch (error) {
+              console.error("Error getting AI suggestion:", error);
+            }
+            setLoadingSuggestion(false);
+          }
+        };
+
+        const handleSaveCategory = async (transactionId) => {
+          try {
+            // Se il campo è vuoto, usa "UNCATEGORIZED" invece di stringa vuota
+            const categoryToSave = newCategory.trim() || "UNCATEGORIZED";
+
+            await fetch(
+              `${API_URL}/api/transactions/${transactionId}/category`,
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  transaction_id: transactionId,
+                  category: categoryToSave,
+                  learn: true,
+                }),
+              },
+            );
+
+            // Aggiorna SOLO la transazione modificata localmente (senza ricaricare tutto)
+            const updatedTransactions = transactions.map((tx) =>
+              tx.id === transactionId
+                ? { ...tx, category: categoryToSave }
+                : tx,
+            );
+
+            // Notifica il parent component dell'aggiornamento locale
+            if (onCategoryUpdate) {
+              onCategoryUpdate(updatedTransactions);
+            }
+
+            setEditingId(null);
+            setAiSuggestion(null);
+            setShowDropdown(false);
+          } catch (error) {
+            console.error("Error updating category:", error);
+            alert("Errore nell'aggiornamento della categoria");
+          }
+        };
+
+        const handleSelectCategory = (category) => {
+          setNewCategory(category);
+          setShowDropdown(false);
+          if (inputRef.current) {
+            inputRef.current.blur();
+          }
+        };
+
+        const handleInputChange = (e) => {
+          const value = e.target.value.toUpperCase();
+          setNewCategory(value);
+          setShowDropdown(value.length > 0);
+        };
+
+        const handleInputFocus = () => {
+          if (newCategory && newCategory.length > 0) {
+            setShowDropdown(true);
+          }
+        };
+
+        const handleInputBlur = () => {
+          setTimeout(() => setShowDropdown(false), 200);
+        };
+
+        const handleSelectAll = () => {
+          if (selectAll) {
+            setSelectedIds([]);
+          } else {
+            setSelectedIds(transactions.map((t) => t.id));
+          }
+          setSelectAll(!selectAll);
+        };
+
+        const handleSelectOne = (id) => {
+          if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter((sid) => sid !== id));
+          } else {
+            setSelectedIds([...selectedIds, id]);
+          }
+        };
+
+        const handleDeleteSelected = async () => {
+          if (selectedIds.length === 0) {
+            alert("⚠️ Seleziona almeno una transazione da eliminare");
+            return;
+          }
+
+          if (
+            !confirm(
+              `Sei sicuro di voler eliminare ${selectedIds.length} transazioni selezionate?\n\n⚠️ Questa azione è irreversibile!`,
+            )
+          ) {
+            return;
+          }
+
+          try {
+            const response = await fetch(
+              `${API_URL}/api/transactions/delete-multiple`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(selectedIds),
+              },
+            );
+
+            if (response.ok) {
+              const result = await response.json();
+              showToast(
+                `${result.deleted_count} transazioni eliminate`,
+                "success",
+              );
+
+              setSelectedIds([]);
+              setSelectAll(false);
+              onCategoryUpdate(null); // Passa null per forzare reload completo
+            } else {
+              showToast("Errore nell'eliminazione", "error");
+            }
+          } catch (error) {
+            alert(`❌ Errore: ${error.message}`);
+          }
+        };
+
+        return (
+          <div className="card">
+            <div className="flex flex-col gap-4 lg:flex-row lg:justify-between lg:items-center mb-5">
+              <h3 className="panel-title">
+                <span className="panel-title-icon">
+                  <Icon name="list" size={18} />
+                </span>
+                <span className="flex items-center gap-2">
+                Transazioni ({transactions.length})
+                </span>
+              </h3>
+              <div className="dashboard-toolbar">
+                <button
+                  onClick={onAddTransaction}
+                  className="px-4 py-2.5 bg-blue-600 text-white rounded-2xl hover:bg-blue-900 flex items-center gap-2 shadow-lg shadow-blue-900/10"
+                >
+                  <Icon name="plus" /> Nuova Transazione
+                </button>
+                {selectedIds.length > 0 && (
+                  <button
+                    onClick={handleDeleteSelected}
+                    className="px-4 py-2.5 bg-white text-red-600 rounded-2xl border border-red-200 hover:bg-red-50 hover:border-red-300 flex items-center gap-2 shadow-sm"
+                  >
+                    <Icon name="trash" /> Elimina Selezionate (
+                    {selectedIds.length})
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="overflow-x-auto rounded-2xl border border-blue-200/80">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-transparent">
+                  <tr>
+                    <th className="px-3 py-3 text-center">
+                      <input
+                        type="checkbox"
+                        checked={selectAll}
+                        onChange={handleSelectAll}
+                        className="w-4 h-4 cursor-pointer"
+                        title="Seleziona tutte"
+                      />
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Data
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Descrizione
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Categoria
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                      Importo
+                    </th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                      Azioni
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {transactions.map((tx) => (
+                    <tr
+                      key={tx.id}
+                      className="border-b border-blue-100 last:border-0"
+                    >
+                      <td className="px-3 py-4 text-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(tx.id)}
+                          onChange={() => handleSelectOne(tx.id)}
+                          className="w-4 h-4 cursor-pointer"
+                        />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {formatDate(tx.date)}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        <div
+                          className="max-w-xs truncate"
+                          title={tx.description_raw}
+                        >
+                          {tx.description_raw}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        {editingId === tx.id ? (
+                          <div className="relative">
+                            <input
+                              ref={inputRef}
+                              type="text"
+                              className="px-3 py-2 border rounded-2xl w-56 bg-white"
+                              value={newCategory}
+                              onChange={handleInputChange}
+                              onFocus={handleInputFocus}
+                              onBlur={handleInputBlur}
+                              placeholder="Digita o seleziona..."
+                              autoComplete="off"
+                            />
+
+                            {showDropdown && (
+                              <div className="absolute z-50 mt-1 w-48 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                {aiSuggestion &&
+                                  aiSuggestion.confidence > 0.5 &&
+                                  newCategory.length > 0 && (
+                                    <div
+                                      onClick={() =>
+                                        handleSelectCategory(
+                                          aiSuggestion.category,
+                                        )
+                                      }
+                                      className="px-3 py-2 hover:bg-purple-50 cursor-pointer border-b border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50"
+                                    >
+                                      <div className="flex items-center justify-between">
+                                        <span className="font-medium text-purple-700">
+                                          <>
+                                            <Icon
+                                              name="ai"
+                                              className="icon"
+                                              size={16}
+                                            />{" "}
+                                            {aiSuggestion.category}
+                                          </>
+                                        </span>
+                                        <span className="text-xs text-purple-600">
+                                          {(
+                                            aiSuggestion.confidence * 100
+                                          ).toFixed(0)}
+                                          %
+                                        </span>
+                                      </div>
+                                      <div className="confidence-bar mt-1">
+                                        <div
+                                          className="confidence-fill"
+                                          style={{
+                                            width: `${aiSuggestion.confidence * 100}%`,
+                                          }}
+                                        ></div>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                {(filteredCategories.length > 0
+                                  ? filteredCategories
+                                  : userCategories.slice(0, 8)
+                                ).map((cat, idx) => (
+                                  <div
+                                    key={idx}
+                                    onClick={() => handleSelectCategory(cat)}
+                                    className="px-3 py-2 hover:bg-blue-50 cursor-pointer flex items-center justify-between"
+                                  >
+                                    <span className="text-gray-800">{cat}</span>
+                                    {newCategory &&
+                                      cat
+                                        .toLowerCase()
+                                        .includes(
+                                          newCategory.toLowerCase(),
+                                        ) && (
+                                        <span className="text-xs text-blue-600">
+                                          ✓
+                                        </span>
+                                      )}
+                                  </div>
+                                ))}
+
+                                {newCategory &&
+                                  filteredCategories.length === 0 && (
+                                    <div className="px-3 py-2 text-gray-500 text-sm italic">
+                                      Nessuna categoria trovata. Premi Invio per
+                                      creare "{newCategory}"
+                                    </div>
+                                  )}
+                              </div>
+                            )}
+
+                            {loadingSuggestion && (
+                              <div className="text-xs text-gray-500 mt-1">
+                                <span className="inline-flex items-center gap-1">
+                                  <Icon name="ai" className="icon" size={14} />{" "}
+                                  Analizzando...
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              !tx.category ||
+                              tx.category === "UNCATEGORIZED" ||
+                              tx.category === "NON_CATEGORIZZATO"
+                                ? "bg-gray-200 text-gray-700"
+                                : "bg-blue-100 text-blue-800"
+                            }`}
+                          >
+                            {tx.category || "Non categorizzato"}
+                          </span>
+                        )}
+                      </td>
+                      <td
+                        className={`px-6 py-4 whitespace-nowrap text-sm text-right font-medium ${
+                          tx.amount > 0 ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {formatCurrency(tx.amount)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
+                        {editingId === tx.id ? (
+                          <div className="flex gap-2 justify-center">
+                            <button
+                              onClick={() => handleSaveCategory(tx.id)}
+                              className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold"
+                              title="Salva e impara"
+                            >
+                              <Icon name="save" size={16} />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setEditingId(null);
+                                setAiSuggestion(null);
+                              }}
+                              className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 font-bold"
+                            >
+                              <Icon name="close" size={16} />
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => handleStartEdit(tx)}
+                            className="inline-flex items-center gap-2 text-blue-700 hover:text-blue-900 font-medium"
+                          >
+                            <span className="inline-flex items-center gap-1">
+                              <Icon name="edit" className="icon" size={14} />{" "}
+                            </span>
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      }
+
+      function ImportModal({ isOpen, onClose, onImportSuccess }) {
+        const [file, setFile] = useState(null);
+        const [allowDuplicates, setAllowDuplicates] = useState(false);
+        const [uploading, setUploading] = useState(false);
+
+        const handleUpload = async () => {
+          const loading = showLoading("Importazione in corso...");
+
+          if (!file) {
+            alert("Seleziona un file");
+            return;
+          }
+
+          setUploading(true);
+
+          const formData = new FormData();
+          formData.append("file", file);
+
+          try {
+            const response = await fetch(
+              `${API_URL}/api/upload?allow_duplicates=${allowDuplicates}`,
+              {
+                method: "POST",
+                body: formData,
+              },
+            );
+
+            const result = await response.json();
+
+            if (response.ok) {
+              hideLoading(loading);
+              showToast(
+                `File importato: ${result.new_transactions} transazioni`,
+                "success",
+              );
+              showSuccessAnimation();
+
+              onImportSuccess();
+              onClose();
+              setFile(null);
+            } else {
+              alert(`❌ Errore: ${result.detail}`);
+            }
+          } catch (error) {
+            hideLoading(loading);
+            showToast(`Errore di connessione: ${error.message}`, "error");
+          } finally {
+            setUploading(false);
+          }
+        };
+
+        return (
+          <div className={`modal ${isOpen ? "active" : ""}`}>
+            <div className="modal-content">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">
+                  <span className="flex items-center gap-2">
+                    <Icon name="import" /> Importa Estratto Conto
+                  </span>
+                </h2>
+                <button
+                  onClick={onClose}
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-100 text-blue-500 hover:text-blue-700 hover:bg-blue-200"
+                  title="Chiudi"
+                >
+                  <Icon name="close" />
+                </button>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Seleziona File (CSV, XLSX, XLS)
+                </label>
+                <input
+                  type="file"
+                  accept=".csv,.xlsx,.xls"
+                  onChange={(e) => setFile(e.target.files[0])}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={allowDuplicates}
+                    onChange={(e) => setAllowDuplicates(e.target.checked)}
+                    className="mr-2"
+                  />
+                  <span className="text-sm text-gray-700">
+                    Consenti duplicati (utile per vedere l'andamento del mese in
+                    corso)
+                  </span>
+                </label>
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={onClose}
+                  className="px-4 py-2.5 bg-white text-blue-700 rounded-2xl border border-blue-200 hover:bg-blue-50"
+                  disabled={uploading}
+                >
+                  Annulla
+                </button>
+                <button
+                  onClick={handleUpload}
+                  className="px-4 py-2.5 bg-blue-600 text-white rounded-2xl hover:bg-blue-900 shadow-lg shadow-blue-900/10"
+                  disabled={uploading || !file}
+                >
+                  {uploading ? "Caricamento..." : "Importa"}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function CategoriesModal({ isOpen, onClose, onUpdate }) {
+        const [rules, setRules] = useState([]);
+        const [userCategories, setUserCategories] = useState([]);
+        const [newCategory, setNewCategory] = useState("");
+        const [newRule, setNewRule] = useState({
+          keywords: "",
+          category: "",
+          type: "expense",
+        });
+        const [editingRule, setEditingRule] = useState(null);
+        const [editingRuleData, setEditingRuleData] = useState(null);
+
+        useEffect(() => {
+          if (isOpen) {
+            fetchRules();
+            fetchUserCategories();
+          }
+        }, [isOpen]);
+
+        const fetchRules = async () => {
+          try {
+            const response = await fetch(`${API_URL}/api/rules`);
+            const data = await response.json();
+            setRules(data);
+          } catch (error) {
+            console.error("Error fetching rules:", error);
+          }
+        };
+
+        const fetchUserCategories = async () => {
+          try {
+            const response = await fetch(`${API_URL}/api/user-categories`);
+            const data = await response.json();
+            setUserCategories(data);
+          } catch (error) {
+            console.error("Error fetching categories:", error);
+          }
+        };
+
+        const handleAddCategory = async () => {
+          if (!newCategory.trim()) {
+            alert("Inserisci un nome per la categoria");
+            return;
+          }
+
+          try {
+            const response = await fetch(
+              `${API_URL}/api/user-categories?category_name=${encodeURIComponent(newCategory)}`,
+              {
+                method: "POST",
+              },
+            );
+
+            if (response.ok) {
+              showToast("Categoria aggiunta con successo", "success");
+              setNewCategory("");
+              fetchUserCategories();
+              onUpdate();
+            }
+          } catch (error) {
+            alert("❌ Errore nell'aggiunta della categoria");
+          }
+        };
+
+        const handleAddRule = async () => {
+          if (!newRule.keywords || !newRule.category) {
+            alert("Compila tutti i campi");
+            return;
+          }
+
+          try {
+            const response = await fetch(`${API_URL}/api/rules`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                keywords: newRule.keywords
+                  .split(",")
+                  .map((k) => k.trim().toLowerCase()),
+                category: newRule.category.toUpperCase(),
+                type: newRule.type,
+                priority: 1,
+              }),
+            });
+
+            if (response.ok) {
+              showToast("Regola aggiunta con successo", "success");
+              fetchRules();
+              setNewRule({ keywords: "", category: "", type: "expense" });
+              onUpdate();
+            }
+          } catch (error) {
+            alert("❌ Errore nell'aggiunta della regola");
+          }
+        };
+
+        const handleDeleteRule = async (index, learned) => {
+          if (!confirm("Eliminare questa regola?")) return;
+
+          try {
+            const response = await fetch(
+              `${API_URL}/api/rules/${index}?learned=${learned}`,
+              {
+                method: "DELETE",
+              },
+            );
+
+            if (response.ok) {
+              showToast("Regola eliminata", "success");
+              fetchRules();
+              onUpdate();
+            }
+          } catch (error) {
+            showToast("Errore nell' eliminazione", "error");
+          }
+        };
+
+        const handleStartEditRule = (rule, index, learned) => {
+          setEditingRule({ index, learned });
+          setEditingRuleData({
+            keywords: rule.keywords.join(", "),
+            category: rule.category,
+            type: rule.type || "expense",
+          });
+        };
+
+        const handleSaveEditRule = async () => {
+          if (!editingRuleData.keywords || !editingRuleData.category) {
+            alert("Compila tutti i campi");
+            return;
+          }
+
+          try {
+            const response = await fetch(
+              `${API_URL}/api/rules/${editingRule.index}?learned=${editingRule.learned}`,
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  keywords: editingRuleData.keywords
+                    .split(",")
+                    .map((k) => k.trim().toLowerCase()),
+                  category: editingRuleData.category.toUpperCase(),
+                  type: editingRuleData.type,
+                  priority: 1,
+                }),
+              },
+            );
+
+            if (response.ok) {
+              showToast("Regola modificata con successo", "success");
+              setEditingRule(null);
+              setEditingRuleData(null);
+              fetchRules();
+              onUpdate();
+            }
+          } catch (error) {
+            alert("❌ Errore nella modifica");
+          }
+        };
+
+        const handleCancelEdit = () => {
+          setEditingRule(null);
+          setEditingRuleData(null);
+        };
+
+        return (
+          <div className={`modal ${isOpen ? "active" : ""}`}>
+            <div className="modal-content" style={{ maxWidth: "900px" }}>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">
+                  <span className="flex items-center gap-2">
+                    <Icon name="categories" /> Gestione Categorie
+                  </span>{" "}
+                </h2>
+                <button
+                  onClick={onClose}
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-100 text-blue-500 hover:text-blue-700 hover:bg-blue-200"
+                  title="Chiudi"
+                >
+                  <Icon name="close" />
+                </button>
+              </div>
+
+              <div className="bg-gradient-to-r from-white to-blue-50 p-5 rounded-3xl mb-6 border border-blue-200/80">
+                <h3 className="font-semibold mb-3">
+                  <span className="flex items-center gap-2">
+                    <Icon name="plus" /> Aggiungi Nuova Categoria
+                  </span>
+                </h3>
+                <div className="dashboard-toolbar">
+                  <input
+                    type="text"
+                    placeholder="Nome categoria (es: ALIMENTARI, TRASPORTI)"
+                    value={newCategory}
+                    onChange={(e) =>
+                      setNewCategory(e.target.value.toUpperCase())
+                    }
+                    className="flex-1 px-3 py-2 border rounded-lg"
+                  />
+                  <button
+                    onClick={handleAddCategory}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 inline-flex items-center justify-center gap-2"
+                  >
+                    <Icon name="plus" /> Aggiungi
+                  </button>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="font-semibold mb-3">
+                  <span className="flex items-center gap-2">
+                    <Icon name="folder" /> Le Tue Categorie (
+                    {userCategories.length})
+                  </span>
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {userCategories.map((cat) => (
+                    <span
+                      key={cat}
+                      className="chip-soft text-blue-700 text-sm"
+                    >
+                      {cat}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white/75 p-5 rounded-3xl mb-6 border border-blue-200/80">
+                <h3 className="font-semibold mb-3">
+                  <span className="flex items-center gap-2">
+                    <Icon name="file" /> Aggiungi Regola di Categorizzazione
+                  </span>
+                </h3>
+                <div className="grid grid-cols-3 gap-3">
+                  <input
+                    type="text"
+                    placeholder="Parole chiave (es: smile,tiger)"
+                    value={newRule.keywords}
+                    onChange={(e) =>
+                      setNewRule({ ...newRule, keywords: e.target.value })
+                    }
+                    className="px-3 py-2 border rounded-lg"
+                  />
+                  <input
+                    type="text"
+                    list="user-categories-list"
+                    placeholder="Categoria"
+                    value={newRule.category}
+                    onChange={(e) =>
+                      setNewRule({
+                        ...newRule,
+                        category: e.target.value.toUpperCase(),
+                      })
+                    }
+                    className="px-3 py-2 border rounded-lg"
+                  />
+                  <datalist id="user-categories-list">
+                    {userCategories.map((cat) => (
+                      <option key={cat} value={cat} />
+                    ))}
+                  </datalist>
+                  <select
+                    value={newRule.type}
+                    onChange={(e) =>
+                      setNewRule({ ...newRule, type: e.target.value })
+                    }
+                    className="px-3 py-2 border rounded-lg"
+                  >
+                    <option value="expense">Uscita</option>
+                    <option value="income">Entrata</option>
+                  </select>
+                </div>
+                <button
+                  onClick={handleAddRule}
+                  className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 inline-flex items-center justify-center gap-2"
+                >
+                  <Icon name="plus" /> Aggiungi Regola
+                </button>
+              </div>
+
+              <div className="max-h-96 overflow-y-auto pr-1">
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <Icon name="list" /> Regole Esistenti
+                </h3>
+
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-gray-600 mb-2">
+                    Regole Manuali
+                  </h4>
+                  {rules
+                    .filter((r) => !r.learned)
+                    .map((rule, idx) =>
+                      editingRule &&
+                      editingRule.index === idx &&
+                      !editingRule.learned ? (
+                        <div
+                          key={idx}
+                          className="bg-amber-50 p-4 rounded-2xl mb-3 border-2 border-amber-200"
+                        >
+                          <div className="grid grid-cols-3 gap-2 mb-2">
+                            <input
+                              type="text"
+                              placeholder="Keywords (es: smile,tiger)"
+                              value={editingRuleData.keywords}
+                              onChange={(e) =>
+                                setEditingRuleData({
+                                  ...editingRuleData,
+                                  keywords: e.target.value,
+                                })
+                              }
+                              className="px-2 py-1 border rounded text-sm"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Categoria"
+                              value={editingRuleData.category}
+                              onChange={(e) =>
+                                setEditingRuleData({
+                                  ...editingRuleData,
+                                  category: e.target.value.toUpperCase(),
+                                })
+                              }
+                              className="px-2 py-1 border rounded text-sm"
+                            />
+                            <select
+                              value={editingRuleData.type}
+                              onChange={(e) =>
+                                setEditingRuleData({
+                                  ...editingRuleData,
+                                  type: e.target.value,
+                                })
+                              }
+                              className="px-2 py-1 border rounded text-sm"
+                            >
+                              <option value="expense">Uscita</option>
+                              <option value="income">Entrata</option>
+                            </select>
+                          </div>
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              onClick={handleSaveEditRule}
+                              className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 inline-flex items-center justify-center gap-1"
+                            >
+                              <Icon name="save" className="icon" size={14} />{" "}
+                              Salva
+                            </button>
+                            <button
+                              onClick={handleCancelEdit}
+                              className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 inline-flex items-center justify-center gap-1"
+                            >
+                              <Icon name="close" className="icon" size={14} />{" "}
+                              Annulla
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          key={idx}
+                          className="bg-white/90 p-4 rounded-2xl mb-3 flex justify-between items-center border border-blue-200/80 shadow-sm"
+                        >
+                          <div>
+                            <span className="font-medium">{rule.category}</span>
+                            <span className="text-sm text-gray-600 ml-3">
+                              Keywords: {rule.keywords.join(", ")}
+                            </span>
+                            <span className="text-xs text-gray-500 ml-3">
+                              Tipo:{" "}
+                              {rule.type === "expense" ? "Uscita" : "Entrata"}
+                            </span>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() =>
+                                handleStartEditRule(rule, idx, false)
+                              }
+                              className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100"
+                              title="Modifica"
+                            >
+                              <Icon name="edit" className="icon" size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteRule(idx, false)}
+                              className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-red-50 text-red-700 hover:bg-red-100"
+                              title="Elimina"
+                            >
+                              <Icon name="trash" className="icon" size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      ),
+                    )}
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-medium text-gray-600 mb-2">
+                    Regole Apprese dall'AI
+                  </h4>
+                  {rules
+                    .filter((r) => r.learned)
+                    .map((rule, idx) =>
+                      editingRule &&
+                      editingRule.index === idx &&
+                      editingRule.learned ? (
+                        <div
+                          key={idx}
+                          className="bg-amber-50 p-4 rounded-2xl mb-3 border-2 border-amber-200"
+                        >
+                          <div className="grid grid-cols-3 gap-2 mb-2">
+                            <input
+                              type="text"
+                              placeholder="Keywords (es: smile,tiger)"
+                              value={editingRuleData.keywords}
+                              onChange={(e) =>
+                                setEditingRuleData({
+                                  ...editingRuleData,
+                                  keywords: e.target.value,
+                                })
+                              }
+                              className="px-2 py-1 border rounded text-sm"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Categoria"
+                              value={editingRuleData.category}
+                              onChange={(e) =>
+                                setEditingRuleData({
+                                  ...editingRuleData,
+                                  category: e.target.value.toUpperCase(),
+                                })
+                              }
+                              className="px-2 py-1 border rounded text-sm"
+                            />
+                            <select
+                              value={editingRuleData.type}
+                              onChange={(e) =>
+                                setEditingRuleData({
+                                  ...editingRuleData,
+                                  type: e.target.value,
+                                })
+                              }
+                              className="px-2 py-1 border rounded text-sm"
+                            >
+                              <option value="expense">Uscita</option>
+                              <option value="income">Entrata</option>
+                            </select>
+                          </div>
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              onClick={handleSaveEditRule}
+                              className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 inline-flex items-center justify-center gap-1"
+                            >
+                              <Icon name="save" className="icon" size={14} />{" "}
+                              Salva
+                            </button>
+                            <button
+                              onClick={handleCancelEdit}
+                              className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 inline-flex items-center justify-center gap-1"
+                            >
+                              <Icon name="close" className="icon" size={14} />{" "}
+                              Annulla
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          key={idx}
+                          className="bg-gradient-to-r from-purple-50 to-indigo-50 p-3 rounded-lg mb-2 flex justify-between items-center border border-purple-200"
+                        >
+                          <div>
+                            <span className="font-medium">{rule.category}</span>
+                            <span className="text-sm text-gray-600 ml-3">
+                              Keywords: {rule.keywords.join(", ")}
+                            </span>
+                            <span className="text-xs text-purple-600 ml-3">
+                              (Appresa {rule.learn_count || 1}x)
+                            </span>
+                            <span className="text-xs text-gray-500 ml-3">
+                              Tipo:{" "}
+                              {rule.type === "expense" ? "Uscita" : "Entrata"}
+                            </span>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() =>
+                                handleStartEditRule(rule, idx, true)
+                              }
+                              className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100"
+                              title="Modifica"
+                            >
+                              <Icon name="edit" className="icon" size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteRule(idx, true)}
+                              className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-red-50 text-red-700 hover:bg-red-100"
+                              title="Elimina"
+                            >
+                              <Icon name="trash" className="icon" size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      ),
+                    )}
+                </div>
+              </div>
+
+              <div className="flex justify-end mt-6">
+                <button
+                  onClick={onClose}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                >
+                  Chiudi
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function AddTransactionModal({ isOpen, onClose, onSuccess }) {
+        const [formData, setFormData] = useState({
+          date: new Date().toISOString().split("T")[0],
+          description: "",
+          amount: "",
+          type: "expense",
+        });
+        const [submitting, setSubmitting] = useState(false);
+
+        const handleSubmit = async () => {
+          if (!formData.description.trim()) {
+            alert("⚠️ Inserisci una descrizione");
+            return;
+          }
+
+          if (!formData.amount || parseFloat(formData.amount) <= 0) {
+            alert("⚠️ Inserisci un importo valido");
+            return;
+          }
+
+          setSubmitting(true);
+
+          try {
+            const response = await fetch(`${API_URL}/api/transactions`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                date: formData.date,
+                description: formData.description,
+                amount: parseFloat(formData.amount),
+                type: formData.type,
+              }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+              const categoryInfo =
+                result.ai_suggestion?.category !== "UNCATEGORIZED"
+                  ? `\n📂 Categoria suggerita: ${result.ai_suggestion.category} (${(result.ai_suggestion.confidence * 100).toFixed(0)}% confidenza)`
+                  : "\n📂 Categoria: Non categorizzata";
+
+              showToast("Transazione creata con successo", "success");
+              showSuccessAnimation();
+
+              // Reset form
+              setFormData({
+                date: new Date().toISOString().split("T")[0],
+                description: "",
+                amount: "",
+                type: "expense",
+              });
+
+              onSuccess();
+              onClose();
+            } else {
+              hideLoading(loading);
+              showToast(`Errore: ${result.detail}`, "error");
+            }
+          } catch (error) {
+            hideLoading(loading);
+            showToast(`Errore di connessione: ${error.message}`, "error");
+          } finally {
+            setSubmitting(false);
+          }
+        };
+
+        return (
+          <div className={`modal ${isOpen ? "active" : ""}`}>
+            <div className="modal-content" style={{ maxWidth: "500px" }}>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                  <Icon name="plus" /> Nuova Transazione
+                </h2>
+                <button
+                  onClick={onClose}
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-100 text-blue-500 hover:text-blue-700 hover:bg-blue-200"
+                  title="Chiudi"
+                >
+                  <Icon name="close" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Data
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.date}
+                    max={new Date().toISOString().split("T")[0]}
+                    onChange={(e) =>
+                      setFormData({ ...formData, date: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Descrizione
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Es: Spesa al supermercato"
+                    value={formData.description}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Importo (€)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    value={formData.amount}
+                    onChange={(e) =>
+                      setFormData({ ...formData, amount: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Tipo
+                  </label>
+                  <select
+                    value={formData.type}
+                    onChange={(e) =>
+                      setFormData({ ...formData, type: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="expense">Uscita</option>
+                    <option value="income">Entrata</option>
+                  </select>
+                </div>
+
+                <div className="bg-blue-50/80 p-4 rounded-2xl border border-blue-100">
+                  <p className="text-sm text-blue-800">
+                    <Icon name="ai" className="icon" size={16} />{" "}
+                    <strong>AI Categorizzazione:</strong> La transazione verrà
+                    automaticamente categorizzata dall'AI in base alla
+                    descrizione.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-3 justify-end mt-6">
+                <button
+                  onClick={onClose}
+                  className="px-4 py-2.5 bg-white text-blue-700 rounded-2xl border border-blue-200 hover:bg-blue-50"
+                  disabled={submitting}
+                >
+                  Annulla
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                  disabled={submitting}
+                >
+                  {submitting ? "⏳ Creando..." : "✅ Crea Transazione"}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function App() {
+        const [stats, setStats] = useState(null);
+        const [transactions, setTransactions] = useState([]);
+        const [categoryStats, setCategoryStats] = useState([]);
+        const [monthlyStats, setMonthlyStats] = useState([]);
+        const [userCategories, setUserCategories] = useState([]);
+        const [filters, setFilters] = useState({
+          startDate: "",
+          endDate: "",
+          category: "",
+        });
+        const [loading, setLoading] = useState(true);
+        const [importModalOpen, setImportModalOpen] = useState(false);
+        const [categoriesModalOpen, setCategoriesModalOpen] = useState(false);
+        const [addTransactionModalOpen, setAddTransactionModalOpen] =
+          useState(false);
+
+        const fetchData = async () => {
+          try {
+            setLoading(true);
+
+            const params = new URLSearchParams();
+            if (filters.startDate)
+              params.append("start_date", filters.startDate);
+            if (filters.endDate) params.append("end_date", filters.endDate);
+            if (filters.category) params.append("category", filters.category);
+
+            const [statsRes, txRes, catStatsRes, monthlyRes, userCatRes] =
+              await Promise.all([
+                fetch(`${API_URL}/api/stats/summary?${params}`),
+                fetch(`${API_URL}/api/transactions?${params}`),
+                fetch(`${API_URL}/api/stats/categories?${params}`),
+                fetch(`${API_URL}/api/stats/monthly`),
+                fetch(`${API_URL}/api/user-categories`),
+              ]);
+
+            const statsData = await statsRes.json();
+            const txData = await txRes.json();
+            const catStatsData = await catStatsRes.json();
+            const monthlyData = await monthlyRes.json();
+            const userCatData = await userCatRes.json();
+
+            setStats(statsData);
+            setTransactions(txData);
+            setCategoryStats(catStatsData);
+            setMonthlyStats(monthlyData);
+            setUserCategories(userCatData);
+
+            setLoading(false);
+          } catch (error) {
+            console.error("Error fetching data:", error);
+            setLoading(false);
+          }
+        };
+
+        useEffect(() => {
+          fetchData();
+        }, [filters]);
+
+        const handleBulkCategorize = async () => {
+          if (
+            !confirm(
+              "Vuoi categorizzare automaticamente tutte le transazioni non categorizzate usando l'AI?",
+            )
+          ) {
+            return;
+          }
+          const loading = showLoading("AI sta categorizzando...");
+
+          try {
+            const response = await fetch(`${API_URL}/api/bulk-categorize`, {
+              method: "POST",
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+              hideLoading(loading);
+              showToast(
+                `${result.categorized} transazioni categorizzate`,
+                "success",
+              );
+              showSuccessAnimation();
+
+              fetchData();
+            } else {
+              hideLoading(loading);
+              showToast(`Errore: ${result.detail}`, "error");
+            }
+          } catch (error) {
+            hideLoading(loading);
+            showToast(`Errore: ${result.detail}`, "error");
+          }
+        };
+
+        const handleGenerateReport = async () => {
+          const loading = showLoading("Generazione report...");
+
+          try {
+            const params = new URLSearchParams();
+            if (filters.startDate)
+              params.append("start_date", filters.startDate);
+            if (filters.endDate) params.append("end_date", filters.endDate);
+
+            const response = await fetch(
+              `${API_URL}/api/reports/generate?${params}`,
+              {
+                method: "POST",
+              },
+            );
+
+            if (response.ok) {
+              const blob = await response.blob();
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `report_${new Date().toISOString().split("T")[0]}.xlsx`;
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+              window.URL.revokeObjectURL(url);
+              hideLoading(loading);
+              showToast("Report scaricato con successo", "success");
+            } else {
+              const errorData = await response.json();
+              const errorMessage = errorData.detail || "Errore sconosciuto";
+              alert(
+                `❌ Errore nella generazione del report:\n\n${errorMessage}`,
+              );
+            }
+          } catch (error) {
+            alert(`❌ Errore: ${error.message}`);
+          }
+        };
+
+        if (loading) {
+          return (
+            <div className="flex items-center justify-center h-screen">
+              <div className="card text-center">
+                <div className="spinner"></div>
+                <div className="text-xl font-semibold text-blue-900">
+                  Caricamento dashboard
+                </div>
+                <div className="text-blue-500 mt-2">
+                  Stiamo preparando dati, filtri e grafici.
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <div className="app-shell min-h-screen">
+            <Header
+              onImport={() => setImportModalOpen(true)}
+              onGenerateReport={handleGenerateReport}
+              onManageCategories={() => setCategoriesModalOpen(true)}
+              onBulkCategorize={handleBulkCategorize}
+            />
+
+            <main className="relative z-10 max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+              <section className="mb-8">
+                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-6">
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-blue-600 mt-3">
+                      Dashboard
+                    </h2>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                  <StatsCard
+                    title="Entrate Totali"
+                    value={formatCurrency(stats?.total_income || 0)}
+                    subtitle={
+                      stats?.date_range ? `${stats.date_range.days} giorni` : ""
+                    }
+                    icon={<Icon name="logo" className="icon-lg" size={32} />}
+                    className="income-card"
+                  />
+                  <StatsCard
+                    title="Uscite Totali"
+                    value={formatCurrency(stats?.total_expenses || 0)}
+                    subtitle={`Media: ${formatCurrency(stats?.daily_average || 0)}/giorno`}
+                    icon={<Icon name="expense" className="icon-lg" size={32} />}
+                    className="expense-card"
+                  />
+                  <StatsCard
+                    title="Risparmio Netto"
+                    value={formatCurrency(stats?.net_savings || 0)}
+                    subtitle={`${((stats?.net_savings / stats?.total_income) * 100 || 0).toFixed(1)}% delle entrate`}
+                    icon={<Icon name="trend" className="icon-lg" size={32} />}
+                    className="savings-card"
+                  />
+                  <StatsCard
+                    title="Transazioni"
+                    value={stats?.transaction_count || 0}
+                    subtitle={`Media: ${formatCurrency(stats?.weekly_average || 0)}/settimana`}
+                    icon={<Icon name="report" className="icon-lg" size={32} />}
+                    className="savings-card"
+                  />
+                </div>
+              </section>
+
+              <Filters
+                filters={filters}
+                setFilters={setFilters}
+                onReset={() =>
+                  setFilters({ startDate: "", endDate: "", category: "" })
+                }
+                onApply={fetchData}
+                userCategories={userCategories}
+              />
+
+              <ChartsSection
+                categoryStats={categoryStats}
+                monthlyStats={monthlyStats}
+              />
+
+              <TransactionsTable
+                transactions={transactions}
+                onCategoryUpdate={(updatedTransactions) => {
+                  // Aggiornamento locale senza ricaricare tutto
+                  if (updatedTransactions) {
+                    setTransactions(updatedTransactions);
+                  } else {
+                    // Fallback: ricarica tutto (per eliminazioni, ecc.)
+                    fetchData();
+                  }
+                }}
+                userCategories={userCategories}
+                onAddTransaction={() => setAddTransactionModalOpen(true)}
+              />
+            </main>
+
+            <ImportModal
+              isOpen={importModalOpen}
+              onClose={() => setImportModalOpen(false)}
+              onImportSuccess={fetchData}
+            />
+
+            <CategoriesModal
+              isOpen={categoriesModalOpen}
+              onClose={() => setCategoriesModalOpen(false)}
+              onUpdate={fetchData}
+            />
+
+            <AddTransactionModal
+              isOpen={addTransactionModalOpen}
+              onClose={() => setAddTransactionModalOpen(false)}
+              onSuccess={fetchData}
+            />
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,237 @@
+2026-03-20 12:11:14,082 - __main__ - INFO - Database initialized successfully
+2026-03-20 12:17:01,518 - __main__ - INFO - Database initialized successfully
+2026-03-20 12:17:27,776 - __main__ - INFO - Database initialized successfully
+2026-03-20 12:21:23,382 - __main__ - INFO - Database initialized successfully
+2026-03-20 12:23:05,882 - __main__ - INFO - Database initialized successfully
+2026-03-20 12:26:11,455 - __main__ - INFO - Database initialized successfully
+2026-03-20 12:26:11,456 - __main__ - ERROR - Failed to create directory 'uploads': name 'Path' is not defined
+2026-03-20 12:26:11,456 - __main__ - ERROR - Failed to create directory 'reports': name 'Path' is not defined
+2026-03-20 12:26:11,456 - __main__ - ERROR - Failed to create directory 'config': name 'Path' is not defined
+2026-03-20 12:26:11,456 - __main__ - ERROR - Failed to create directory 'data': name 'Path' is not defined
+2026-03-20 12:29:30,236 - __main__ - INFO - Database initialized successfully
+2026-03-20 12:40:22,238 - __main__ - INFO - Database initialized successfully
+2026-03-20 12:40:53,391 - __main__ - INFO - Database initialized successfully
+2026-03-20 12:41:43,029 - backend_main - INFO - Database initialized successfully
+2026-03-20 12:46:42,075 - __main__ - INFO - Database initialized successfully
+2026-03-20 12:46:42,154 - backend_main - INFO - Database initialized successfully
+2026-03-20 12:47:07,222 - backend_main - ERROR - Error generating report: object of type 'float' has no len()
+Traceback (most recent call last):
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/backend_main.py", line 672, in generate_excel_report
+    generate_report(transactions, report_path)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/modules/reporter.py", line 33, in generate_report
+    _write_full_data(df, writer)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/modules/reporter.py", line 68, in _write_full_data
+    df_full[col].astype(str).apply(len).max(),
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/series.py", line 5084, in apply
+    ).apply()
+      ~~~~~^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/apply.py", line 1520, in apply
+    return self.apply_standard()
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/apply.py", line 1578, in apply_standard
+    mapped = obj._map_values(mapper=curried)
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/base.py", line 1020, in _map_values
+    return arr.map(mapper, na_action=na_action)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/arrays/base.py", line 2744, in map
+    return map_array(self, mapper, na_action=na_action)
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/algorithms.py", line 1710, in map_array
+    return lib.map_infer(values, mapper)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "pandas/_libs/lib.pyx", line 3071, in pandas._libs.lib.map_infer
+TypeError: object of type 'float' has no len()
+
+2026-03-20 12:53:29,938 - __main__ - INFO - Database initialized successfully
+2026-03-20 12:53:30,019 - backend_main - INFO - Database initialized successfully
+2026-03-20 12:53:38,393 - backend_main - INFO - Generating report - Start: None, End: None, Output: reports
+2026-03-20 12:53:38,395 - backend_main - INFO - Generating report to: reports/financial_report_20260320_125338.xlsx
+2026-03-20 12:53:38,395 - modules.reporter - INFO - Generating report with 33 transactions
+2026-03-20 12:53:38,730 - modules.reporter - ERROR - Error writing full data sheet: object of type 'float' has no len()
+2026-03-20 12:53:38,751 - modules.reporter - ERROR - Error generating report: object of type 'float' has no len()
+2026-03-20 12:53:38,764 - backend_main - ERROR - Error generating report: Failed to generate report: object of type 'float' has no len()
+Traceback (most recent call last):
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/modules/reporter.py", line 52, in generate_report
+    _write_full_data(df, writer)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/modules/reporter.py", line 100, in _write_full_data
+    df_full[col].astype(str).apply(len).max(),
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/series.py", line 5084, in apply
+    ).apply()
+      ~~~~~^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/apply.py", line 1520, in apply
+    return self.apply_standard()
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/apply.py", line 1578, in apply_standard
+    mapped = obj._map_values(mapper=curried)
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/base.py", line 1020, in _map_values
+    return arr.map(mapper, na_action=na_action)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/arrays/base.py", line 2744, in map
+    return map_array(self, mapper, na_action=na_action)
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/algorithms.py", line 1710, in map_array
+    return lib.map_infer(values, mapper)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "pandas/_libs/lib.pyx", line 3071, in pandas._libs.lib.map_infer
+TypeError: object of type 'float' has no len()
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/backend_main.py", line 705, in generate_excel_report
+    generate_report(transactions, str(report_full_path))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/modules/reporter.py", line 70, in generate_report
+    raise Exception(f"Failed to generate report: {str(e)}")
+Exception: Failed to generate report: object of type 'float' has no len()
+
+2026-03-20 12:53:41,951 - backend_main - INFO - Generating report - Start: 2026-02-28, End: 2026-03-20, Output: reports
+2026-03-20 12:53:41,953 - backend_main - INFO - Generating report to: reports/financial_report_20260320_125341.xlsx
+2026-03-20 12:53:41,954 - modules.reporter - INFO - Generating report with 15 transactions
+2026-03-20 12:53:41,962 - modules.reporter - ERROR - Error writing full data sheet: object of type 'float' has no len()
+2026-03-20 12:53:41,976 - modules.reporter - ERROR - Error generating report: object of type 'float' has no len()
+2026-03-20 12:53:41,978 - backend_main - ERROR - Error generating report: Failed to generate report: object of type 'float' has no len()
+Traceback (most recent call last):
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/modules/reporter.py", line 52, in generate_report
+    _write_full_data(df, writer)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/modules/reporter.py", line 100, in _write_full_data
+    df_full[col].astype(str).apply(len).max(),
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/series.py", line 5084, in apply
+    ).apply()
+      ~~~~~^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/apply.py", line 1520, in apply
+    return self.apply_standard()
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/apply.py", line 1578, in apply_standard
+    mapped = obj._map_values(mapper=curried)
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/base.py", line 1020, in _map_values
+    return arr.map(mapper, na_action=na_action)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/arrays/base.py", line 2744, in map
+    return map_array(self, mapper, na_action=na_action)
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/algorithms.py", line 1710, in map_array
+    return lib.map_infer(values, mapper)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "pandas/_libs/lib.pyx", line 3071, in pandas._libs.lib.map_infer
+TypeError: object of type 'float' has no len()
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/backend_main.py", line 705, in generate_excel_report
+    generate_report(transactions, str(report_full_path))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/modules/reporter.py", line 70, in generate_report
+    raise Exception(f"Failed to generate report: {str(e)}")
+Exception: Failed to generate report: object of type 'float' has no len()
+
+2026-03-20 12:53:50,418 - backend_main - INFO - Generating report - Start: None, End: None, Output: reports
+2026-03-20 12:53:50,419 - backend_main - INFO - Generating report to: reports/financial_report_20260320_125350.xlsx
+2026-03-20 12:53:50,419 - modules.reporter - INFO - Generating report with 33 transactions
+2026-03-20 12:53:50,426 - modules.reporter - ERROR - Error writing full data sheet: object of type 'float' has no len()
+2026-03-20 12:53:50,439 - modules.reporter - ERROR - Error generating report: object of type 'float' has no len()
+2026-03-20 12:53:50,441 - backend_main - ERROR - Error generating report: Failed to generate report: object of type 'float' has no len()
+Traceback (most recent call last):
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/modules/reporter.py", line 52, in generate_report
+    _write_full_data(df, writer)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/modules/reporter.py", line 100, in _write_full_data
+    df_full[col].astype(str).apply(len).max(),
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/series.py", line 5084, in apply
+    ).apply()
+      ~~~~~^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/apply.py", line 1520, in apply
+    return self.apply_standard()
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/apply.py", line 1578, in apply_standard
+    mapped = obj._map_values(mapper=curried)
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/base.py", line 1020, in _map_values
+    return arr.map(mapper, na_action=na_action)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/arrays/base.py", line 2744, in map
+    return map_array(self, mapper, na_action=na_action)
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/algorithms.py", line 1710, in map_array
+    return lib.map_infer(values, mapper)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "pandas/_libs/lib.pyx", line 3071, in pandas._libs.lib.map_infer
+TypeError: object of type 'float' has no len()
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/backend_main.py", line 705, in generate_excel_report
+    generate_report(transactions, str(report_full_path))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/modules/reporter.py", line 70, in generate_report
+    raise Exception(f"Failed to generate report: {str(e)}")
+Exception: Failed to generate report: object of type 'float' has no len()
+
+2026-03-20 13:01:55,887 - __main__ - INFO - Database initialized successfully
+2026-03-20 13:01:55,963 - backend_main - INFO - Database initialized successfully
+2026-03-20 13:02:07,089 - backend_main - INFO - Generating report - Start: 2026-02-28, End: 2026-03-20, Output: reports
+2026-03-20 13:02:07,090 - backend_main - INFO - Generating report to: reports/financial_report_20260320_130207.xlsx
+2026-03-20 13:02:07,091 - modules.reporter - INFO - Generating report with 15 transactions
+2026-03-20 13:02:07,484 - modules.reporter - ERROR - Error writing full data sheet: object of type 'float' has no len()
+2026-03-20 13:02:07,507 - modules.reporter - ERROR - Error generating report: object of type 'float' has no len()
+2026-03-20 13:02:07,520 - backend_main - ERROR - Error generating report: Failed to generate report: object of type 'float' has no len()
+Traceback (most recent call last):
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/modules/reporter.py", line 52, in generate_report
+    _write_full_data(df, writer)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/modules/reporter.py", line 100, in _write_full_data
+    df_full[col].astype(str).apply(len).max(),
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/series.py", line 5084, in apply
+    ).apply()
+      ~~~~~^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/apply.py", line 1520, in apply
+    return self.apply_standard()
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/apply.py", line 1578, in apply_standard
+    mapped = obj._map_values(mapper=curried)
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/base.py", line 1020, in _map_values
+    return arr.map(mapper, na_action=na_action)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/arrays/base.py", line 2744, in map
+    return map_array(self, mapper, na_action=na_action)
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pandas/core/algorithms.py", line 1710, in map_array
+    return lib.map_infer(values, mapper)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "pandas/_libs/lib.pyx", line 3071, in pandas._libs.lib.map_infer
+TypeError: object of type 'float' has no len()
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/backend_main.py", line 705, in generate_excel_report
+    generate_report(transactions, str(report_full_path))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fabiopastore/Desktop/App/FinancialApp/modules/reporter.py", line 70, in generate_report
+    raise Exception(f"Failed to generate report: {str(e)}")
+Exception: Failed to generate report: object of type 'float' has no len()
+
+2026-03-20 13:09:15,872 - __main__ - INFO - Database initialized successfully
+2026-03-20 13:09:15,943 - backend_main - INFO - Database initialized successfully
+2026-03-20 13:09:24,882 - backend_main - INFO - Generating report - Start: 2026-02-28, End: 2026-03-20, Output: reports
+2026-03-20 13:09:24,884 - backend_main - INFO - Generating report to: reports/financial_report_20260320_130924.xlsx
+2026-03-20 13:09:24,884 - modules.reporter - INFO - Generating report with 15 transactions
+2026-03-20 13:09:25,324 - modules.reporter - INFO - Report generated successfully: reports/financial_report_20260320_130924.xlsx
+2026-03-20 13:09:25,324 - backend_main - INFO - Report generated successfully: reports/financial_report_20260320_130924.xlsx
+2026-03-20 13:15:52,394 - backend_main - INFO - Learned categorization: CENE from 'KFC SPOON DIRECT 2 SRL ROMA ITA OPERAZIONE CARTA 2'
+2026-03-20 13:16:21,622 - backend_main - INFO - Learned categorization: TRASPORTI from 'ATAC ROMA'
+2026-03-20 13:16:21,629 - backend_main - INFO - Learned categorization: TRASPORTI from 'ATAC ROMA'
+2026-03-20 13:16:21,634 - backend_main - INFO - Learned categorization: TRASPORTI from 'ATAC ROMA'
+2026-03-20 13:16:21,638 - backend_main - INFO - Learned categorization: TRASPORTI from 'ATAC ROMA'
+2026-03-20 13:17:57,904 - backend_main - INFO - Generating report - Start: 2026-02-28, End: 2026-03-20, Output: reports
+2026-03-20 13:17:57,907 - backend_main - INFO - Generating report to: reports/financial_report_20260320_131757.xlsx
+2026-03-20 13:17:57,907 - modules.reporter - INFO - Generating report with 15 transactions
+2026-03-20 13:17:57,972 - modules.reporter - INFO - Report generated successfully: reports/financial_report_20260320_131757.xlsx
+2026-03-20 13:17:57,972 - backend_main - INFO - Report generated successfully: reports/financial_report_20260320_131757.xlsx
+2026-03-20 14:52:43,935 - __main__ - INFO - Database initialized successfully
+2026-03-20 14:52:44,032 - backend_main - INFO - Database initialized successfully

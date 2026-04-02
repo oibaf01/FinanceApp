@@ -1,0 +1,119 @@
+{
+  "rules": [
+    {
+      "keywords": [
+        "giroconto"
+      ],
+      "category": "STIPENDIO",
+      "subcategory": null,
+      "type": "income",
+      "priority": 1
+    },
+    {
+      "keywords": [
+        "smile"
+      ],
+      "category": "ALIMENTARI",
+      "subcategory": null,
+      "type": "expense",
+      "priority": 1
+    }
+  ],
+  "learned_rules": [
+    {
+      "keywords": [
+        "just",
+        "nicola",
+        "manfredonia",
+        "petr",
+        "stazione",
+        "troiano",
+        "panzaria"
+      ],
+      "category": "NUTRIZIONE",
+      "subcategory": null,
+      "type": "expense",
+      "learned": true,
+      "learn_count": 19,
+      "updated_at": "2026-03-23T17:38:54.250055"
+    },
+    {
+      "keywords": [
+        "stazione",
+        "troiano",
+        "petr."
+      ],
+      "category": "BENZINA",
+      "subcategory": null,
+      "type": "expense",
+      "learned": true,
+      "learn_count": 1
+    },
+    {
+      "keywords": [
+        "cene"
+      ],
+      "category": "CENE",
+      "subcategory": null,
+      "type": "expense",
+      "priority": 1,
+      "learned": true,
+      "learn_count": 6,
+      "created_at": null,
+      "updated_at": "2026-03-23T12:45:56.790250"
+    },
+    {
+      "keywords": [
+        "giroconto",
+        "banche",
+        "pastore",
+        "fabio",
+        "bonsepa",
+        "cambio",
+        "spese",
+        "favore",
+        "payment",
+        "from",
+        "gaia",
+        "teresa"
+      ],
+      "category": "STIPENDIO",
+      "subcategory": null,
+      "type": "expense",
+      "learned": true,
+      "learn_count": 18,
+      "updated_at": "2026-03-23T17:47:21.107962"
+    },
+    {
+      "keywords": [
+        "tiger",
+        "amazon",
+        "iliad"
+      ],
+      "category": "SHOPPING",
+      "subcategory": null,
+      "type": "expense",
+      "learned": true,
+      "learn_count": 69,
+      "created_at": "2026-03-20T11:13:53.944119",
+      "updated_at": "2026-03-23T17:47:21.111662"
+    },
+    {
+      "keywords": [
+        "withdrawal",
+        "cash",
+        "iliad",
+        "pastore",
+        "gaia",
+        "teresa"
+      ],
+      "category": "CASH",
+      "subcategory": null,
+      "type": "expense",
+      "learned": true,
+      "learn_count": 5,
+      "created_at": "2026-03-20T17:17:11.260875",
+      "updated_at": "2026-03-23T17:47:21.075540"
+    }
+  ]
+}

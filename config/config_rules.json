@@ -1,0 +1,178 @@
+{
+  "rules": [
+    {
+      "keywords": ["smile", "tiger", "market", "supermercato"],
+      "category": "FOOD",
+      "subcategory": "Groceries",
+      "type": "expense"
+    },
+    {
+      "keywords": ["operazione carta", "pagamento carta", "pos"],
+      "category": "CARD_PAYMENT",
+      "subcategory": "Card Transaction",
+      "type": "expense"
+    },
+    {
+      "keywords": ["salary", "stipendio", "payroll", "wage"],
+      "category": "INCOME",
+      "subcategory": "Salary",
+      "type": "income"
+    },
+    {
+      "keywords": ["bonus", "premio"],
+      "category": "INCOME",
+      "subcategory": "Bonus",
+      "type": "income"
+    },
+    {
+      "keywords": ["interest", "interessi"],
+      "category": "INCOME",
+      "subcategory": "Interest",
+      "type": "income"
+    },
+    {
+      "keywords": ["supermarket", "grocery", "supermercato", "conad", "coop", "esselunga", "carrefour"],
+      "category": "FOOD",
+      "subcategory": "Groceries",
+      "type": "expense"
+    },
+    {
+      "keywords": ["restaurant", "ristorante", "pizzeria", "bar", "cafe", "mcdonald", "burger"],
+      "category": "FOOD",
+      "subcategory": "Dining Out",
+      "type": "expense"
+    },
+    {
+      "keywords": ["rent", "affitto", "lease"],
+      "category": "HOUSING",
+      "subcategory": "Rent",
+      "type": "expense"
+    },
+    {
+      "keywords": ["mortgage", "mutuo"],
+      "category": "HOUSING",
+      "subcategory": "Mortgage",
+      "type": "expense"
+    },
+    {
+      "keywords": ["electricity", "gas", "water", "enel", "eni", "utilities", "bolletta"],
+      "category": "HOUSING",
+      "subcategory": "Utilities",
+      "type": "expense"
+    },
+    {
+      "keywords": ["internet", "phone", "mobile", "vodafone", "tim", "wind", "iliad"],
+      "category": "UTILITIES",
+      "subcategory": "Telecom",
+      "type": "expense"
+    },
+    {
+      "keywords": ["fuel", "gas station", "benzina", "diesel", "eni", "shell", "q8"],
+      "category": "TRANSPORT",
+      "subcategory": "Fuel",
+      "type": "expense"
+    },
+    {
+      "keywords": ["parking", "parcheggio", "toll", "pedaggio"],
+      "category": "TRANSPORT",
+      "subcategory": "Parking & Tolls",
+      "type": "expense"
+    },
+    {
+      "keywords": ["train", "bus", "metro", "trenitalia", "atm", "ticket"],
+      "category": "TRANSPORT",
+      "subcategory": "Public Transport",
+      "type": "expense"
+    },
+    {
+      "keywords": ["insurance", "assicurazione"],
+      "category": "INSURANCE",
+      "subcategory": "General",
+      "type": "expense"
+    },
+    {
+      "keywords": ["doctor", "pharmacy", "farmacia", "hospital", "medical"],
+      "category": "HEALTH",
+      "subcategory": "Medical",
+      "type": "expense"
+    },
+    {
+      "keywords": ["gym", "fitness", "sport"],
+      "category": "HEALTH",
+      "subcategory": "Fitness",
+      "type": "expense"
+    },
+    {
+      "keywords": ["netflix", "spotify", "amazon prime", "disney", "subscription"],
+      "category": "ENTERTAINMENT",
+      "subcategory": "Subscriptions",
+      "type": "expense"
+    },
+    {
+      "keywords": ["cinema", "theater", "concert", "movie"],
+      "category": "ENTERTAINMENT",
+      "subcategory": "Events",
+      "type": "expense"
+    },
+    {
+      "keywords": ["amazon", "ebay", "shopping", "store"],
+      "category": "SHOPPING",
+      "subcategory": "Online Shopping",
+      "type": "expense"
+    },
+    {
+      "keywords": ["clothing", "shoes", "zara", "h&m", "nike"],
+      "category": "SHOPPING",
+      "subcategory": "Clothing",
+      "type": "expense"
+    },
+    {
+      "keywords": ["book", "libro", "bookstore"],
+      "category": "EDUCATION",
+      "subcategory": "Books",
+      "type": "expense"
+    },
+    {
+      "keywords": ["course", "corso", "training", "tuition"],
+      "category": "EDUCATION",
+      "subcategory": "Courses",
+      "type": "expense"
+    },
+    {
+      "keywords": ["hotel", "airbnb", "booking", "flight", "airline"],
+      "category": "TRAVEL",
+      "subcategory": "Accommodation & Transport",
+      "type": "expense"
+    },
+    {
+      "keywords": ["atm withdrawal", "prelievo", "cash"],
+      "category": "CASH",
+      "subcategory": "Withdrawal",
+      "type": "transfer"
+    },
+    {
+      "keywords": ["transfer", "bonifico", "wire"],
+      "category": "TRANSFER",
+      "subcategory": "Bank Transfer",
+      "type": "transfer"
+    },
+    {
+      "keywords": ["tax", "tasse", "iva", "revenue"],
+      "category": "TAXES",
+      "subcategory": "General",
+      "type": "expense"
+    },
+    {
+      "keywords": ["donation", "donazione", "charity"],
+      "category": "CHARITY",
+      "subcategory": "Donations",
+      "type": "expense"
+    },
+    {
+      "keywords": ["savings", "risparmio", "investment"],
+      "category": "SAVINGS",
+      "subcategory": "Investment",
+      "type": "transfer"
+    }
+  ]
+}

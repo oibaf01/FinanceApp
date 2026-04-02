@@ -1,0 +1,1266 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pagamenti Ricorrenti - Finance Tracker</title>
+
+    <!-- React & ReactDOM -->
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+      :root {
+        --color-primary: #0f172a;
+        --color-secondary: #10b981;
+        --color-accent: #2563eb;
+        --color-success: #10b981;
+        --color-warning: #f59e0b;
+        --color-error: #ef4444;
+        --color-info: #3b82f6;
+        --color-surface: rgba(255, 255, 255, 0.82);
+        --color-surface-strong: rgba(255, 255, 255, 0.94);
+        --color-border: rgba(148, 163, 184, 0.16);
+        --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.08);
+        --shadow-hover: 0 24px 60px rgba(15, 23, 42, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #0f172a;
+        background:
+          radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 28%),
+          radial-gradient(circle at top right, rgba(16, 185, 129, 0.12), transparent 24%),
+          linear-gradient(180deg, #f8fbff 0%, #f1f5f9 42%, #eef2ff 100%);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+        background-size: 32px 32px;
+        mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.28), transparent 70%);
+      }
+
+      .app-shell {
+        position: relative;
+      }
+
+      .app-shell::before,
+      .app-shell::after {
+        content: "";
+        position: fixed;
+        width: 340px;
+        height: 340px;
+        border-radius: 9999px;
+        filter: blur(65px);
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.55;
+      }
+
+      .app-shell::before {
+        top: -120px;
+        right: -40px;
+        background: rgba(59, 130, 246, 0.22);
+      }
+
+      .app-shell::after {
+        bottom: -120px;
+        left: -60px;
+        background: rgba(16, 185, 129, 0.18);
+      }
+
+      .dashboard-header {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+        background: rgba(248, 250, 252, 0.72);
+        backdrop-filter: blur(20px);
+      }
+
+      .dashboard-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+        justify-content: flex-end;
+      }
+
+      .brand-mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
+        color: white;
+        box-shadow: 0 12px 32px rgba(37, 99, 235, 0.25);
+      }
+
+      .section-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.75rem;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.7);
+        color: #334155;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .card {
+        position: relative;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        backdrop-filter: blur(16px);
+        border-radius: 24px;
+        box-shadow: var(--shadow-soft);
+        padding: 1.5rem;
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(148, 163, 184, 0.08));
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+
+      .stat-card {
+        position: relative;
+        color: white;
+        border-radius: 24px;
+        padding: 1.5rem;
+        min-height: 178px;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+        overflow: hidden;
+      }
+
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 34%);
+        pointer-events: none;
+      }
+
+      .stat-card::after {
+        content: "";
+        position: absolute;
+        width: 140px;
+        height: 140px;
+        right: -30px;
+        bottom: -40px;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .expense-card {
+        background: linear-gradient(135deg, #be185d 0%, #f97316 100%);
+      }
+
+      .income-card {
+        background: linear-gradient(135deg, #0f766e 0%, #10b981 100%);
+      }
+
+      .savings-card {
+        background: linear-gradient(135deg, #1d4ed8 0%, #38bdf8 100%);
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        padding: 24px;
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(10px);
+      }
+
+      .modal.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background: var(--color-surface-strong);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        border-radius: 28px;
+        padding: 2rem;
+        max-width: 900px;
+        width: min(100%, 980px);
+        max-height: min(86vh, 960px);
+        overflow-y: auto;
+        box-shadow: 0 32px 80px rgba(15, 23, 42, 0.24);
+      }
+
+      .ai-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%);
+        color: white;
+        padding: 6px 10px;
+        border-radius: 9999px;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.03em;
+        box-shadow: 0 10px 28px rgba(99, 102, 241, 0.22);
+      }
+
+      .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .toast {
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        border-radius: 18px;
+        padding: 16px 18px;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 320px;
+        animation: slideInRight 0.3s ease-out;
+        backdrop-filter: blur(12px);
+      }
+
+      .toast.hiding {
+        animation: slideOutRight 0.3s ease-in;
+      }
+
+      .toast-success {
+        border-left: 4px solid var(--color-success);
+      }
+      .toast-error {
+        border-left: 4px solid var(--color-error);
+      }
+      .toast-info {
+        border-left: 4px solid var(--color-info);
+      }
+      .toast-warning {
+        border-left: 4px solid var(--color-warning);
+      }
+
+      @keyframes slideInRight {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideOutRight {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+
+      .loading-overlay {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.65);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        backdrop-filter: blur(8px);
+      }
+
+      .loading-content {
+        background: rgba(255, 255, 255, 0.96);
+        border-radius: 24px;
+        padding: 2rem 2.25rem;
+        text-align: center;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+      }
+
+      .loading-overlay.fade-out {
+        animation: fadeOut 0.3s ease-out;
+      }
+
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+
+      .spinner {
+        border: 3px solid #dbeafe;
+        border-top: 3px solid #2563eb;
+        border-radius: 50%;
+        width: 42px;
+        height: 42px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes shake {
+        0%, 100% {
+          transform: translateX(0);
+        }
+        10%, 30%, 50%, 70%, 90% {
+          transform: translateX(-10px);
+        }
+        20%, 40%, 60%, 80% {
+          transform: translateX(10px);
+        }
+      }
+
+      .error-shake {
+        animation: shake 0.5s;
+      }
+
+      .confetti-particle {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background: #10b981;
+        top: -10px;
+        z-index: 9998;
+        animation: confettiFall 2s linear;
+      }
+
+      @keyframes confettiFall {
+        to {
+          transform: translateY(100vh) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      .icon {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        display: inline-block;
+        vertical-align: middle;
+        flex-shrink: 0;
+      }
+
+      .icon-lg {
+        width: 32px;
+        height: 32px;
+      }
+
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+
+      input,
+      select,
+      textarea {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(203, 213, 225, 0.9) !important;
+        border-radius: 14px !important;
+        min-height: 46px;
+        transition: all 0.2s ease;
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03);
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: rgba(59, 130, 246, 0.65) !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.14) !important;
+      }
+
+      button,
+      a {
+        transition: all 0.2s ease;
+      }
+
+      button:hover,
+      a:hover {
+        transform: translateY(-1px);
+      }
+
+      table {
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+
+      thead th {
+        position: sticky;
+        top: 0;
+        background: rgba(248, 250, 252, 0.92) !important;
+        backdrop-filter: blur(10px);
+        z-index: 1;
+        font-size: 0.7rem !important;
+        letter-spacing: 0.08em;
+      }
+
+      tbody tr {
+        transition: background-color 0.2s ease, transform 0.2s ease;
+      }
+
+      tbody tr:hover {
+        background: rgba(248, 250, 252, 0.86) !important;
+      }
+
+      .chip-soft {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.45rem 0.8rem;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.76);
+        border: 1px solid rgba(203, 213, 225, 0.66);
+      }
+
+      .panel-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #0f172a;
+      }
+
+      .panel-title-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.14), rgba(16, 185, 129, 0.16));
+        color: #1d4ed8;
+      }
+
+      .subtle-divider {
+        height: 1px;
+        background: linear-gradient(90deg, rgba(226, 232, 240, 0), rgba(226, 232, 240, 1), rgba(226, 232, 240, 0));
+      }
+
+      @media (max-width: 960px) {
+        .dashboard-toolbar {
+          justify-content: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <div id="toast-container" class="toast-container"></div>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      // API Base URL
+      const API_URL = "http://localhost:8000";
+      // Toast Notification System
+      const showToast = (message, type = "info") => {
+        const container = document.getElementById("toast-container");
+        if (!container) return;
+
+        const toast = document.createElement("div");
+        toast.className = `toast toast-${type}`;
+
+        const icons = {
+          success:
+            '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>',
+          error:
+            '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>',
+          warning:
+            '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>',
+          info: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>',
+        };
+
+        const colors = {
+          success: "#10B981",
+          error: "#EF4444",
+          warning: "#F59E0B",
+          info: "#3B82F6",
+        };
+
+        toast.innerHTML = `         <div class="toast-icon" style="color: ${colors[type]}">${icons[type]}</div>         <div class="toast-message" style="color: #0F172A; font-weight: 500;">${message}</div>     `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+          toast.classList.add("hiding");
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      };
+
+      // Loading Overlay
+      const showLoading = (message = "Caricamento...") => {
+        const overlay = document.createElement("div");
+        overlay.className = "loading-overlay";
+        overlay.innerHTML = `         <div class="loading-content">             <div class="spinner"></div>             <p style="color: #0F172A; font-weight: 600; font-size: 16px;">${message}</p>         </div>     `;
+        document.body.appendChild(overlay);
+        return overlay;
+      };
+
+      const hideLoading = (overlay) => {
+        if (overlay) {
+          overlay.classList.add("fade-out");
+          setTimeout(() => overlay.remove(), 300);
+        }
+      };
+
+      // Success Animation (Confetti)
+      const showSuccessAnimation = () => {
+        const colors = ["#10B981", "#3B82F6", "#F59E0B", "#EF4444", "#8B5CF6"];
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement("div");
+          particle.className = "confetti-particle";
+          particle.style.left = Math.random() * 100 + "%";
+          particle.style.background =
+            colors[Math.floor(Math.random() * colors.length)];
+          particle.style.animationDelay = Math.random() * 0.5 + "s";
+          document.body.appendChild(particle);
+
+          setTimeout(() => particle.remove(), 2000);
+        }
+      };
+
+      // Shake Element
+      const shakeElement = (element) => {
+        if (element) {
+          element.classList.add("error-shake");
+          setTimeout(() => element.classList.remove("error-shake"), 500);
+        }
+      };
+
+      const formatCurrency = (amount) => {
+        return new Intl.NumberFormat("it-IT", {
+          style: "currency",
+          currency: "EUR",
+        }).format(amount);
+      };
+
+      const formatDate = (dateStr) => {
+        return new Date(dateStr).toLocaleDateString("it-IT");
+      };
+
+      const Icon = ({ name, className = "icon", size = 20 }) => {
+        const icons = {
+          logo: (
+            <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: size, height: size }}>
+              <rect x="3" y="6" width="18" height="12" rx="2"></rect>
+              <path d="M3 10h18"></path>
+              <path d="M7 15h.01"></path>
+              <path d="M11 15h2"></path>
+            </svg>
+          ),
+          recurring: (
+            <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: size, height: size }}>
+              <path d="M3 12a9 9 0 0 1 15.54-6.36"></path>
+              <path d="M21 3v6h-6"></path>
+              <path d="M21 12a9 9 0 0 1-15.54 6.36"></path>
+              <path d="M3 21v-6h6"></path>
+            </svg>
+          ),
+          calendar: (
+            <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: size, height: size }}>
+              <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+              <path d="M16 2v4"></path>
+              <path d="M8 2v4"></path>
+              <path d="M3 10h18"></path>
+            </svg>
+          ),
+          plus: (
+            <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: size, height: size }}>
+              <path d="M12 5v14"></path>
+              <path d="M5 12h14"></path>
+            </svg>
+          ),
+          save: (
+            <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: size, height: size }}>
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <path d="M17 21v-8H7v8"></path>
+              <path d="M7 3v5h8"></path>
+            </svg>
+          ),
+          edit: (
+            <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: size, height: size }}>
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4Z"></path>
+            </svg>
+          ),
+          trash: (
+            <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: size, height: size }}>
+              <path d="M3 6h18"></path>
+              <path d="M8 6V4h8v2"></path>
+              <path d="M19 6l-1 14H6L5 6"></path>
+              <path d="M10 11v6"></path>
+              <path d="M14 11v6"></path>
+            </svg>
+          ),
+          income: (
+            <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: size, height: size }}>
+              <path d="M12 19V5"></path>
+              <path d="m5 12 7-7 7 7"></path>
+            </svg>
+          ),
+          categories: (
+            <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: size, height: size }}>
+              <path d="M20.59 13.41 11 3.83V3H4v7h.83l9.58 9.59a2 2 0 0 0 2.83 0l3.35-3.35a2 2 0 0 0 0-2.83Z"></path>
+              <path d="M7 7h.01"></path>
+            </svg>
+          ),
+          trend: (
+            <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: size, height: size }}>
+              <path d="M3 17l6-6 4 4 8-8"></path>
+              <path d="M14 7h7v7"></path>
+            </svg>
+          ),
+          back: (
+    <svg className="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M10 5L3 12l7 7v-5h4.5c3.6 0 5.8 1.6 7.5 4.7-.5-6.5-4.3-9.7-9.8-9.7H10V5z" />
+    </svg>
+  ),
+
+  backLg: (
+    <svg className="icon-lg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M10 5L3 12l7 7v-5h4.5c3.6 0 5.8 1.6 7.5 4.7-.5-6.5-4.3-9.7-9.8-9.7H10V5z" />
+    </svg>
+  ),expense: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M12 5v14"></path>
+              <path d="m19 12-7 7-7-7"></path>
+            </svg>
+          ),
+        };
+
+        return icons[name] || null;
+      };
+
+      function Header() {
+        return (
+          <header className="dashboard-header">
+            <div className="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8">
+              <div className="flex flex-col gap-5 lg:flex-row lg:justify-between lg:items-center">
+                <div className="space-y-3">
+                  
+                  <div className="flex items-start gap-4">
+                    <div className="brand-mark">
+                      <Icon name="logo" className="icon-lg" size={26} />
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-blue-600">
+                          Pagamenti Ricorrenti
+                        </h1>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="dashboard-toolbar">
+                  <a
+                    href="index.html"
+                    className="px-4 py-2.5 bg-white/80 text-blue-700 rounded-2xl border border-blue-200 hover:border-blue-300 hover:text-blue-700 hover:bg-white flex items-center gap-2 no-underline shadow-sm"
+                  >
+                     <Icon name="back" className="back-lg" size={26} />Dashboard
+                  </a>
+                </div>
+              </div>
+            </div>
+          </header>
+        );
+      }
+
+      function StatsCard({ title, value, subtitle, icon, className }) {
+        return (
+          <div className={`stat-card ${className}`}>
+            <div className="relative z-10 flex justify-between items-start gap-6">
+              <div className="flex-1">
+                <p className="text-white/80 text-sm font-medium tracking-wide">{title}</p>
+                <p className="text-3xl md:text-[2rem] font-bold mt-3 tracking-tight">{value}</p>
+                {subtitle && <p className="text-white/70 text-xs mt-2">{subtitle}</p>}
+              </div>
+              <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-white">
+                {icon}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function App() {
+        const [payments, setPayments] = useState([]);
+        const [stats, setStats] = useState({
+          monthly_total: 0,
+          active_subscriptions: 0,
+          active_financing: 0,
+        });
+        const [showForm, setShowForm] = useState(false);
+        const [editingPayment, setEditingPayment] = useState(null);
+        const [formData, setFormData] = useState({
+          name: "",
+          amount: "",
+          frequency: "monthly",
+          type: "subscription",
+          start_date: "",
+          end_date: "",
+        });
+        const [loading, setLoading] = useState(true);
+
+        useEffect(() => {
+          fetchPayments();
+          fetchStats();
+        }, []);
+
+        const fetchPayments = async () => {
+          try {
+            const response = await fetch(`${API_URL}/api/recurring-payments`);
+            if (response.ok) {
+              const data = await response.json();
+              setPayments(data);
+            }
+            setLoading(false);
+          } catch (error) {
+            console.error("Error fetching payments:", error);
+            setLoading(false);
+          }
+        };
+
+        const fetchStats = async () => {
+          try {
+            const response = await fetch(
+              `${API_URL}/api/recurring-payments/stats`,
+            );
+            if (response.ok) {
+              const data = await response.json();
+              setStats(data);
+            }
+          } catch (error) {
+            console.error("Error fetching stats:", error);
+          }
+        };
+
+        const handleSubmit = async (e) => {
+            const loading = showLoading(editingPayment ? 'Aggiornamento...' : 'Creazione pagamento...');
+          e.preventDefault();
+
+          try {
+            const url = editingPayment
+              ? `${API_URL}/api/recurring-payments/${editingPayment.id}`
+              : `${API_URL}/api/recurring-payments`;
+
+            const method = editingPayment ? "PUT" : "POST";
+
+            // Prepare data - remove end_date if empty
+            const dataToSend = {
+              name: formData.name,
+              amount: parseFloat(formData.amount),
+              frequency: formData.frequency,
+              type: formData.type,
+              start_date: formData.start_date,
+            };
+
+            // Only add end_date if it's not empty
+            if (formData.end_date && formData.end_date.trim() !== "") {
+              dataToSend.end_date = formData.end_date;
+            }
+
+            const response = await fetch(url, {
+              method: method,
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(dataToSend),
+            });
+
+            if (response.ok) {
+              hideLoading(loading);
+              showToast(
+                editingPayment ? "Pagamento aggiornato" : "Pagamento aggiunto",
+                "success",
+              );
+              showSuccessAnimation();
+
+              setShowForm(false);
+              setEditingPayment(null);
+              setFormData({
+                name: "",
+                amount: "",
+                frequency: "monthly",
+                type: "subscription",
+                start_date: "",
+                end_date: "",
+              });
+              fetchPayments();
+              fetchStats();
+            } else {
+              const error = await response.json();
+              hideLoading(loading);
+              showToast(
+                `Errore: ${error.detail || "Errore sconosciuto"}`,
+                "error",
+              );
+            }
+          } catch (error) {
+            
+            alert(
+              `❌ Errore di connessione: ${error.message}\n\nVerifica che il backend sia in esecuzione e aggiornato.`,
+            );
+          }
+        };
+
+        const handleEdit = (payment) => {
+          setEditingPayment(payment);
+          setFormData({
+            name: payment.name,
+            amount: payment.amount.toString(),
+            frequency: payment.frequency,
+            type: payment.type,
+            start_date: payment.start_date,
+            end_date: payment.end_date || "",
+          });
+          setShowForm(true);
+        };
+
+        const handleDelete = async (id) => {
+          if (
+            !confirm(
+              "Sei sicuro di voler eliminare questo pagamento ricorrente?",
+            )
+          ) {
+            return;
+          }
+
+          try {
+            const response = await fetch(
+              `${API_URL}/api/recurring-payments/${id}`,
+              {
+                method: "DELETE",
+              },
+            );
+
+            if (response.ok) {
+showToast('Pagamento eliminato', 'success');
+              fetchPayments();
+              fetchStats();
+            } else {
+showToast("Errore nell'eliminazione", 'error');
+            }
+          } catch (error) {
+            showToast(` Errore: ${error.message}`, 'error');
+          }
+        };
+
+        const getFrequencyLabel = (freq) => {
+          const labels = {
+            monthly: "Mensile",
+            yearly: "Annuale",
+            weekly: "Settimanale",
+          };
+          return labels[freq] || freq;
+        };
+
+        const getTypeLabel = (type) => {
+          const labels = {
+            subscription: "Abbonamento",
+            financing: "Finanziamento",
+          };
+          return labels[type] || type;
+        };
+
+        if (loading) {
+          return (
+            <div className="app-shell">
+              <Header />
+              <div className="flex items-center justify-center h-screen">
+                <div className="card text-lg font-semibold text-slate-700 flex items-center gap-3">
+                  <div className="spinner" style={{ margin: 0 }}></div> Caricamento dati...
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <div className="min-h-screen app-shell">
+            <Header />
+
+            <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <StatsCard
+                  title="Totale Mensile"
+                  value={formatCurrency(stats.monthly_total)}
+                  subtitle="Costo complessivo attuale"
+                  icon={<Icon name="expense" size={28} />}
+                  className="expense-card"
+                />
+                <StatsCard
+                  title="Abbonamenti Attivi"
+                  value={stats.active_subscriptions}
+                  subtitle="Servizi ricorrenti in corso"
+                  icon={<Icon name="recurring" size={28} />}
+                  className="savings-card"
+                />
+                <StatsCard
+                  title="Finanziamenti Attivi"
+                  value={stats.active_financing}
+                  subtitle="Piani con durata definita"
+                  icon={<Icon name="recurring" size={28} />}
+                  className="savings-card"
+                />
+              </div>
+
+              {/* Add Payment Button */}
+              <div className="mb-6">
+                <button
+                  onClick={() => {
+                    setShowForm(!showForm);
+                    setEditingPayment(null);
+                    setFormData({
+                      name: "",
+                      amount: "",
+                      frequency: "monthly",
+                      type: "subscription",
+                      start_date: "",
+                      end_date: "",
+                    });
+                  }}
+                  className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-500 text-white rounded-2xl hover:from-blue-600 hover:to-blue-600 flex items-center gap-2 shadow-lg shadow-blue-500/20"
+                >
+                  {showForm ? <>Annulla</> : <><Icon name="plus" /> Aggiungi Pagamento</>}
+                </button>
+              </div>
+
+              {/* Form */}
+              {showForm && (
+                <div className="card mb-6">
+                  <h3 className="panel-title mb-4">
+                    <span className="panel-title-icon">
+                      <Icon name={editingPayment ? "edit" : "plus"} />
+                    </span>
+                    {editingPayment ? "Modifica Pagamento" : "Nuovo Pagamento Ricorrente"}
+                  </h3>
+                  <form onSubmit={handleSubmit}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Nome *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          value={formData.name}
+                          onChange={(e) =>
+                            setFormData({ ...formData, name: e.target.value })
+                          }
+                          placeholder="es. Netflix, Mutuo Casa"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Importo (€) *
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          value={formData.amount}
+                          onChange={(e) =>
+                            setFormData({ ...formData, amount: e.target.value })
+                          }
+                          placeholder="0.00"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Frequenza *
+                        </label>
+                        <select
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          value={formData.frequency}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              frequency: e.target.value,
+                            })
+                          }
+                        >
+                          <option value="monthly">Mensile</option>
+                          <option value="yearly">Annuale</option>
+                          <option value="weekly">Settimanale</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Tipo *
+                        </label>
+                        <select
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          value={formData.type}
+                          onChange={(e) =>
+                            setFormData({ ...formData, type: e.target.value })
+                          }
+                        >
+                          <option value="subscription">Abbonamento</option>
+                          <option value="financing">Finanziamento</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Data Inizio *
+                        </label>
+                        <input
+                          type="date"
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          value={formData.start_date}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              start_date: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Data Fine (opzionale)
+                        </label>
+                        <input
+                          type="date"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          value={formData.end_date}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              end_date: e.target.value,
+                            })
+                          }
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Lascia vuoto per abbonamenti senza scadenza
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 justify-end mt-4">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowForm(false);
+                          setEditingPayment(null);
+                        }}
+                        className="px-4 py-2.5 bg-white text-slate-700 rounded-2xl border border-slate-200 hover:border-slate-300 shadow-sm"
+                      >
+                        Annulla
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-500 text-white rounded-2xl hover:from-blue-600 hover:to-blue-600 inline-flex items-center gap-2 shadow-lg shadow-blue-500/20"
+                      >
+                        {editingPayment ? <><Icon name="save" /> Salva Modifiche</> : <><Icon name="plus" /> Aggiungi</>}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* Payments Table */}
+              <div className="card">
+                <h3 className="panel-title mb-4">
+                  <span className="panel-title-icon">
+                    <Icon name="categories" />
+                  </span>
+                  Pagamenti Ricorrenti ({payments.length})
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Nome
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Importo
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Frequenza
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Tipo
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Data Inizio
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Data Fine
+                        </th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                          Azioni
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {payments.length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan="7"
+                            className="px-6 py-8 text-center text-gray-500"
+                          >
+                            Nessun pagamento ricorrente. Clicca su "Aggiungi
+                            Pagamento" per iniziare.
+                          </td>
+                        </tr>
+                      ) : (
+                        payments.map((payment) => (
+                          <tr key={payment.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                              {payment.name}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">
+                              {formatCurrency(payment.amount)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {getFrequencyLabel(payment.frequency)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  payment.type === "subscription"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : "bg-purple-100 text-purple-800"
+                                }`}
+                              >
+                                {getTypeLabel(payment.type)}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {formatDate(payment.start_date)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {payment.end_date ? (
+                                formatDate(payment.end_date)
+                              ) : (
+                                <span className="text-gray-400 italic">
+                                  Nessuna scadenza
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
+                              <div className="flex gap-2 justify-center">
+                                <button
+                                  onClick={() => handleEdit(payment)}
+                                  className="w-10 h-10 rounded-2xl border border-blue-200 bg-blue-50 text-blue-600 hover:text-blue-900 hover:border-blue-300 inline-flex items-center justify-center"
+                                  title="Modifica"
+                                >
+                                  <Icon name="edit" size={18} />
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(payment.id)}
+                                  className="w-10 h-10 rounded-2xl border border-red-200 bg-red-50 text-red-600 hover:text-red-900 hover:border-red-300 inline-flex items-center justify-center"
+                                  title="Elimina"
+                                >
+                                  <Icon name="trash" size={18} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </main>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
