@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- prova 2-->
+<!-- prova 3-->
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
@@ -1047,6 +1047,22 @@ async function fetchWithAuth(url, options = {}) {
               <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
             </svg>
           ),
+          menu: (
+            <svg
+              className={className}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: size, height: size }}
+            >
+              <path d="M3 12h18"></path>
+              <path d="M3 6h18"></path>
+              <path d="M3 18h18"></path>
+            </svg>
+          ),
         };
 
         return icons[name] || null;
@@ -1060,6 +1076,7 @@ async function fetchWithAuth(url, options = {}) {
 }) {
   // ========== NUOVO: Leggi info utente ==========
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const handleLogout = () => {
     if (confirm('Sei sicuro di voler uscire?')) {
@@ -1095,7 +1112,8 @@ async function fetchWithAuth(url, options = {}) {
               </div>
             </div>
           </div>
-          <div className="dashboard-toolbar">
+          {/* Desktop Toolbar - nascosta su mobile */}
+          <div className="dashboard-toolbar hidden md:flex">
             <button
               onClick={onManageCategories}
               className="px-4 py-2.5 bg-white text-blue-700 rounded-2xl border border-blue-200 hover:border-blue-300 hover:bg-blue-50 flex items-center gap-2 shadow-sm"
@@ -1136,6 +1154,62 @@ async function fetchWithAuth(url, options = {}) {
               <Icon name="logout" size={20} />
             </button>
           </div>
+
+          {/* Mobile Toolbar - visibile solo su mobile */}
+          <div className="flex md:hidden items-center gap-3">
+            <button
+              onClick={handleLogout}
+              className="px-3 py-2.5 bg-white text-red-600 rounded-2xl border border-red-200 hover:border-red-300 hover:bg-red-50 flex items-center gap-2 shadow-sm"
+              title="Esci"
+            >
+              <Icon name="logout" size={20} />
+            </button>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="px-3 py-2.5 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 flex items-center gap-2 shadow-sm"
+              title="Menu"
+            >
+              <Icon name="menu" size={20} />
+            </button>
+          </div>
+
+          {/* Mobile Dropdown Menu */}
+          {mobileMenuOpen && (
+            <div className="absolute top-full right-4 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-200 py-2 z-50 md:hidden">
+              <button
+                onClick={() => { onManageCategories(); setMobileMenuOpen(false); }}
+                className="w-full px-4 py-3 text-left hover:bg-blue-50 flex items-center gap-3 text-gray-700"
+              >
+                <Icon name="categories" size={18} /> Categorie
+              </button>
+              <button
+                onClick={() => { onBulkCategorize(); setMobileMenuOpen(false); }}
+                className="w-full px-4 py-3 text-left hover:bg-purple-50 flex items-center gap-3 text-gray-700"
+              >
+                <Icon name="ai" size={18} /> Auto-Categorizza
+              </button>
+              <button
+                onClick={() => { onImport(); setMobileMenuOpen(false); }}
+                className="w-full px-4 py-3 text-left hover:bg-blue-50 flex items-center gap-3 text-gray-700"
+              >
+                <Icon name="import" size={18} /> Importa
+              </button>
+              <button
+                onClick={() => { onGenerateReport(); setMobileMenuOpen(false); }}
+                className="w-full px-4 py-3 text-left hover:bg-blue-50 flex items-center gap-3 text-gray-700"
+              >
+                <Icon name="report" size={18} /> Report
+              </button>
+              <button
+                onClick={() => { window.location.href = 'recurring.html'; }}
+                className="w-full px-4 py-3 text-left hover:bg-blue-50 flex items-center gap-3 text-gray-700"
+              >
+                <Icon name="recurring" size={18} /> Ricorrenti
+              </button>
+            </div>
+          )}
+          
+        </div>
         </div>
       </div>
     </header>
