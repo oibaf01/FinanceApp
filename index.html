@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- prova 5-->
+<!-- prova 6-->
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
@@ -598,7 +598,7 @@ async function fetchWithAuth(url, options = {}) {
     'Authorization': `Bearer ${token}`
   };
   
-  const response = await fetchWithAuth(url, { ...options, headers });
+  const response = await fetch(url, { ...options, headers });
   
   // Se il server risponde 401 (non autorizzato), redirect a login
   if (response.status === 401) {
