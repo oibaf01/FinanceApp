@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- prova 7-->
+<!-- prova 1-->
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
@@ -589,22 +589,33 @@
         
         // Se non c'è token, redirect a login
         if (!token) {
+          console.error('❌ Token non trovato, redirect a login');
           window.location.href = 'login.html';
-          return;
+          return Promise.reject(new Error('No token'));
         }
+        
+        // Debug: mostra il token (primi 20 caratteri)
+        console.log('🔑 Token trovato:', token.substring(0, 20) + '...');
         
         const headers = {
           ...options.headers,
           'Authorization': `Bearer ${token}`
         };
         
+        console.log('📤 Richiesta a:', url);
+        console.log('📋 Headers:', headers);
+        
         const response = await fetch(url, { ...options, headers });
+        
+        console.log('📥 Risposta:', response.status, response.statusText);
         
         // Se il server risponde 401 (non autorizzato), redirect a login
         if (response.status === 401) {
+          console.error('❌ 401 Unauthorized - Token non valido');
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           window.location.href = 'login.html';
+          return Promise.reject(new Error('Unauthorized'));
         }
         
         return response;
