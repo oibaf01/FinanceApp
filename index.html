@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- prova 8-->
+<!-- prova 5-->
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
@@ -581,40 +581,35 @@
       const { useState, useEffect, useRef } = React;
 
       const API_URL = "http://localhost:8000";
-      
-      // ========== AUTENTICAZIONE ==========
-      // Funzione per fare fetch con autenticazione
-      async function fetchWithAuth(url, options = {}) {
-        const token = localStorage.getItem('token');
-        
-        const headers = {
-          'Content-Type': 'application/json',
-          ...options.headers
-        };
-        
-        // Aggiungi Authorization header solo se c'è un token
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-        }
-        
-        try {
-          const response = await fetch(url, { ...options, headers });
-          
-          // Se il server risponde 401 (non autorizzato), redirect a login
-          if (response.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = 'login.html';
-            throw new Error('Unauthorized');
-          }
-          
-          return response;
-        } catch (error) {
-          // Se c'è un errore di rete o altro, propaga l'errore
-          throw error;
-        }
-      }
-      // ========== FINE AUTENTICAZIONE ==========
+      // ========== AUTENTICAZIONE - INIZIO ==========
+// Check se l'utente è loggato
+const token = localStorage.getItem('token');
+if (!token) {
+  // Se non c'è token, redirect a login
+  window.location.href = 'login.html';
+}
+
+// Funzione per fare fetch con autenticazione
+async function fetchWithAuth(url, options = {}) {
+  const token = localStorage.getItem('token');
+  
+  const headers = {
+    ...options.headers,
+    'Authorization': `Bearer ${token}`
+  };
+  
+  const response = await fetchWithAuth(url, { ...options, headers });
+  
+  // Se il server risponde 401 (non autorizzato), redirect a login
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
+  }
+  
+  return response;
+}
+// ========== AUTENTICAZIONE - FINE ==========
       // Toast Notification System
       const showToast = (message, type = "info") => {
         const container = document.getElementById("toast-container");
