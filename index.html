@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- prova 3-->
+<!-- prova 4-->
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
@@ -635,10 +635,7 @@ async function fetchWithAuth(url, options = {}) {
           info: "#3B82F6",
         };
 
-        toast.innerHTML = `
-        <div class="toast-icon" style="color: ${colors[type]}">${icons[type]}</div>
-        <div class="toast-message" style="color: #0F172A; font-weight: 500;">${message}</div>
-    `;
+        toast.innerHTML = `         <div class="toast-icon" style="color: ${colors[type]}">${icons[type]}</div>         <div class="toast-message" style="color: #0F172A; font-weight: 500;">${message}</div>     `;
 
         container.appendChild(toast);
 
@@ -652,12 +649,7 @@ async function fetchWithAuth(url, options = {}) {
       const showLoading = (message = "Caricamento...") => {
         const overlay = document.createElement("div");
         overlay.className = "loading-overlay";
-        overlay.innerHTML = `
-        <div class="loading-content">
-            <div class="spinner"></div>
-            <p style="color: #0F172A; font-weight: 600; font-size: 16px;">${message}</p>
-        </div>
-    `;
+        overlay.innerHTML = `         <div class="loading-content">             <div class="spinner"></div>             <p style="color: #0F172A; font-weight: 600; font-size: 16px;">${message}</p>         </div>     `;
         document.body.appendChild(overlay);
         return overlay;
       };
@@ -1208,8 +1200,6 @@ async function fetchWithAuth(url, options = {}) {
               </button>
             </div>
           )}
-          
-        </div>
         </div>
       </div>
     </header>
