@@ -1,58 +1,15 @@
-(.venv) fabiopastore@MacBookPro FinancialApp % python backend_main.py
-Traceback (most recent call last):
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pydantic/networks.py", line 965, in import_email_validator
-    import email_validator
-ModuleNotFoundError: No module named 'email_validator'
+(index):64 cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+(anonymous) @ (index):64
+transformScriptTags.ts:271 You are using the in-browser Babel transformer. Be sure to precompile your scripts for production - https://babeljs.io/docs/setup/
+(anonymous) @ transformScriptTags.ts:271
+babel.min.js:3 Uncaught SyntaxError: /Inline Babel script: Expected corresponding JSX closing tag for <header>. (635:6)
 
-The above exception was the direct cause of the following exception:
+  633 |         </div>
+  634 |         </div>
+> 635 |       </div>
+      |       ^
+  636 |     </header>
+  637 |   );
+  638 | }
+index.html:1 Unsafe attempt to load URL file:///Users/fabiopastore/Desktop/App/FinancialApp/index.html from frame with URL file:///Users/fabiopastore/Desktop/App/FinancialApp/index.html. 'file:' URLs are treated as unique security origins.
 
-Traceback (most recent call last):
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/backend_main.py", line 72, in <module>
-    class UserCreate(BaseModel):
-    ...<2 lines>...
-        full_name: str
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pydantic/_internal/_model_construction.py", line 255, in __new__
-    complete_model_class(
-    ~~~~~~~~~~~~~~~~~~~~^
-        cls,
-        ^^^^
-    ...<3 lines>...
-        create_model_module=_create_model_module,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pydantic/_internal/_model_construction.py", line 648, in complete_model_class
-    schema = gen_schema.generate_schema(cls)
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pydantic/_internal/_generate_schema.py", line 729, in generate_schema
-    schema = self._generate_schema_inner(obj)
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pydantic/_internal/_generate_schema.py", line 1023, in _generate_schema_inner
-    return self._model_schema(obj)
-           ~~~~~~~~~~~~~~~~~~^^^^^
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pydantic/_internal/_generate_schema.py", line 856, in _model_schema
-    {k: self._generate_md_field_schema(k, v, decorators) for k, v in fields.items()},
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pydantic/_internal/_generate_schema.py", line 1228, in _generate_md_field_schema
-    schema, metadata = self._common_field_schema(name, field_info, decorators)
-                       ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pydantic/_internal/_generate_schema.py", line 1282, in _common_field_schema
-    schema = self._apply_annotations(
-        source_type,
-        annotations + validators_from_decorators,
-    )
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pydantic/_internal/_generate_schema.py", line 2227, in _apply_annotations
-    schema = get_inner_schema(source_type)
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pydantic/_internal/_schema_generation_shared.py", line 83, in __call__
-    schema = self._handler(source_type)
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pydantic/_internal/_generate_schema.py", line 2203, in inner_handler
-    schema = self._generate_schema_from_get_schema_method(obj, source_type)
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pydantic/_internal/_generate_schema.py", line 919, in _generate_schema_from_get_schema_method
-    schema = get_schema(
-        source, CallbackGetCoreSchemaHandler(self._generate_schema_inner, self, ref_mode=ref_mode)
-    )
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pydantic/networks.py", line 1005, in __get_pydantic_core_schema__
-    import_email_validator()
-    ~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/fabiopastore/Desktop/App/FinancialApp/.venv/lib/python3.14/site-packages/pydantic/networks.py", line 967, in import_email_validator
-    raise ImportError("email-validator is not installed, run `pip install 'pydantic[email]'`") from e
-ImportError: email-validator is not installed, run `pip install 'pydantic[email]'`
-(.venv) fabiopastore@MacBookPro FinancialApp % 
